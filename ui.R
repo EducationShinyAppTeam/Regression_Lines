@@ -55,7 +55,7 @@ ui <- dashboardPage(
             "Show the regression line to compute and display
              the regression line."
             ), 
-          tags$li("Click RESET to clean both points and regression lines.")
+          tags$li("Click RESET to clear both points and regression lines.")
           ), 
         br(), 
         div(

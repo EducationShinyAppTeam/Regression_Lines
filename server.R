@@ -11,7 +11,7 @@ server <- function(input, output,session) {
         tags$li('Create your own line by entering the values for 
                 both slope and intercept.'), 
         tags$li('Create points by clicking in the plot.'), 
-        tags$li('Click RESET to clean both points and regression lines.')
+        tags$li('Click RESET to clear both points and regression lines.')
       )
     )
   })
@@ -342,7 +342,7 @@ server <- function(input, output,session) {
       # show correlation
       if (input$correlation  == "TRUE" & length(val$x) >= 3 ){
         output$correlation <- renderText({
-          paste("Correlation = ", round(cor(val$x,val$y), digits = 5))
+          paste("Correlation = ", round(cor(val$x,val$y), digits = 2))
         })
       }
       else if (input$correlation  == "TRUE" & length(val$x) < 3 ){
