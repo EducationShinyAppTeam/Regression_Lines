@@ -276,6 +276,7 @@ ui <- list(
             )
           )
         ),
+        ### References ----
         tabItem(
           tabName = "References",
           h2("References"),
@@ -314,7 +315,11 @@ ui <- list(
             "Statistical Applets - Correlation and Regression (n.d.),
           Available from
           http://digitalfirst.bfwpub.com/stats_applet/generic_stats_applet_5_correg.html"
-          )
+          ),
+          br(),
+          br(),
+          br(),
+          boastUtils::copyrightInfo()
         )
       )
     )
@@ -517,12 +522,12 @@ server <- function(input, output,session) {
       mclust2Dplot(data = data1, what = "classification",
                    classification = fit$classification, main = FALSE,
                    xlim = c(-2,2), ylim = c(-0.2,5),
-                   cex = input$opt.cex,
-                   cex.lab = input$opt.cexaxis)
+                   cex = 1.5,
+                   cex.lab = 1.5)
     }, error = function(warn){
       # Otherwise just plot the points and instructions
       plot(val$x, val$y, xlim = c(-5, 5), ylim = c(-0.2, 5), xlab = "X",
-           ylab = "Y", cex = 1.5,
+           ylab = "Y", cex = 1.5, cex.lab = 1.5,
            cex.axis = 1.5, pch = 16, col = "blue")
       if (input$yourownline > 0 ){
         abline(input$intercept, input$slope, col="red", lwd = "3.8")
