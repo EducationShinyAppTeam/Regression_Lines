@@ -27,6 +27,9 @@ ui <- list(
       tags$li(class = "dropdown",
               actionLink("inst", icon("info",class = "myClass"))),
       tags$li(
+        class = "dropdown",
+        boastUtils::surveyLink(name = "Regression_Line")),
+      tags$li(
         class = 'dropdown',
         tags$a(href = "https://shinyapps.science.psu.edu/",
                icon('home', lib = 'font-awesome'))
@@ -89,10 +92,10 @@ ui <- list(
           The app was further updated by Zhiliang Zhang and Jiajun Gao
           in June 2018 and by Daehoon Gwak in July 2020.
           Special thanks to Sitong Liu for help on some programming issues.",
-            br(),
-            br(),
-            br(),
-            div(class = "updated", "Last Update: 9/15/2020 by NJH.")
+          br(),
+          br(),
+          br(),
+          div(class = "updated", "Last Update: 9/15/2020 by NJH.")
           )
         ),
         ### Prerequisites ----
@@ -343,11 +346,11 @@ server <- function(input, output,session) {
       )
     )
   })
-
+  
   ## Create Reactive Values ----
   c <- reactiveValues(right = c(sample(1:11,1)))
   val <- reactiveValues(x = NULL, y = NULL)
-
+  
   ## First Go button  ----
   observeEvent(input$go1, {
     updateTabItems(
@@ -356,7 +359,7 @@ server <- function(input, output,session) {
       selected = "prerequisite"
     )
   })
-
+  
   ## Second Go button ----
   observeEvent(input$go2, {
     updateTabItems(
@@ -365,14 +368,14 @@ server <- function(input, output,session) {
       selected = "explore"
     )
   })
-
+  
   ## New Challenge button ----
   observeEvent(input$newchallenge, {
     ### Reset values
     c$right <- sample(1:11,1)
     val$x <- NULL
     val$y <- NULL
-
+    
     ### Update inputs
     updateSliderInput(
       session = session,
@@ -405,7 +408,7 @@ server <- function(input, output,session) {
     ### Reset values
     val$x <- NULL
     val$y <- NULL
-
+    
     #Update inputs
     updateSliderInput(
       session = session,
@@ -433,13 +436,13 @@ server <- function(input, output,session) {
       value = FALSE
     )
   })
-
+  
   ## User's Linear Equation ----
   output$yourline <- renderText({
     paste("Equation of your line: y =",
           input$intercept,"+", "(", input$slope,")", "* x")
   })
-
+  
   # REVISE Generate and Display Questions ----
   output$question <- renderText({
     if (c$right == 1){
@@ -478,7 +481,7 @@ server <- function(input, output,session) {
       (Check the “Show regression” box to see how you did.)"
     }
     else if  (c$right == 8){
-      "Challenge: create some points with a correlation of -0.2
+      "Challenge: Create some points with a correlation of -0.2
       and then draw your own line that is your guess at the regression line.
       (Check the “Show regression” box to see how you did.)"
     }
@@ -496,7 +499,7 @@ server <- function(input, output,session) {
       the correlation go down to 0."
     }
   })
-
+  
   # Listen for clicks
   observe({
     # Initially will be empty
@@ -554,7 +557,7 @@ server <- function(input, output,session) {
             paste("Sorry, correlation <= -0.8.",
                   "Please add other points or try again for the correlation.",
                   "Please check the “Regression line” box to see
-                  how you did for regression")
+                  how you did for regression.")
           }
         }
         else if(c$right == 2){
@@ -565,14 +568,14 @@ server <- function(input, output,session) {
                                               digits = 2) < 0.5){
             paste("The correlation is correct!",
                   "Please check the “Regression line” box to see
-                  how you did for regression")
+                  how you did for regression.")
           }
           else if(length(val$x) >= 3 & round(cor(val$x,val$y),
                                              digits = 2) >= 0.5){
             paste("Sorry, correlation >= 0.5.",
                   "Please add other points or try again for the correlation.",
                   "Please check the “Regression line” box to see
-                  how you did for regression")
+                  how you did for regression.")
           }
         }
         else if (c$right == 3){
@@ -581,7 +584,7 @@ server <- function(input, output,session) {
           }
           else if (length(val$x) >= 3){
             paste("Please check the “Show regression” box to see
-                  how you did for regression")
+                  how you did for regression.")
           }
         }
         else if (c$right == 4){
@@ -589,11 +592,11 @@ server <- function(input, output,session) {
             paste("Please draw the line first.")
           }
           else if (length(val$x) < 3){
-            paste("Please add more points ")
+            paste("Please add more points.")
           }
           else if (length(val$x >= 3)){
             paste("Please check the “Show regression” box to see
-                  how well do the lines match")
+                  how well do the lines match.")
           }
         }
         else if (c$right == 5){
@@ -601,11 +604,11 @@ server <- function(input, output,session) {
             paste("Please draw the line first.")
           }
           else if (length(val$x) < 3){
-            paste("Please add more points ")
+            paste("Please add more points.")
           }
           else if (length(val$x >= 3)){
             paste("Please check the “Show regression” box to see
-                  how well do the lines match")
+                  how well do the lines match.")
           }
         }
         else if (c$right == 6){
