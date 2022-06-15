@@ -105,7 +105,7 @@ ui <- list(
           h2("Prerequisites"),
           br(),
           box(
-            title = "Correlation",
+            title = strong("Correlation"),
             p("Correlation measures the strength of the linear association
             between two variables/attributes and is therefore
             not appropriate for non-linear patterns.
@@ -126,7 +126,7 @@ ui <- list(
             width = 12
           ),
           box(
-            title = "Regression Lines",
+            title = strong("Regression Lines"),
             p("The regression line provides a straight line that describes
              a response variable Y that changes as an explanatory
              variable X changes. The regression line has the linear form
