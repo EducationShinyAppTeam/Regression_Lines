@@ -16,6 +16,9 @@ APP_DESCP  <<- paste(
 
 # Define global constants and functions ----
 
+# Neil, please help here
+# csv <- read.csv("RegLine.csv")
+
 # Define the UI ----
 ui <- list(
   dashboardPage(
