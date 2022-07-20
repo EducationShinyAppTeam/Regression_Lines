@@ -1,0 +1,12 @@
+﻿type,prompt,intercept,slope,correlation1,correlation2,relationship,checkList
+1,Draw your own line with the equation y = 3 – 2x and then add some points that have that as their regression line.,3,-2,,,linear,"ownLine, points, regression"
+1,Draw your own line with the equation y = 2 + 3x and then add some points that have that as their regression.,2,3,,,linear,"ownLine, points, regression"
+2,"Create some points that have a strong non-linear relationship, but a correlation between -0.1 and 0.1.",,,-0.1,0.1,nonlinear,"points, relationship, correlation"
+2,"Create some points that have a strong non-linear relationship, but a correlation between 0.4 and 0.6.",,,0.4,0.6,nonlinear,"points, relationship, correlation"
+3,Draw some points on a scatterplot that have y = 2x + 1 as their regression line.,1,2,,,linear,"points, regression"
+4,Draw some points on a scatterplot that have y = 3 – 2x as their regression line and a correlation more than -0.8.,3,-2,-0.8,1,linear,"points, regression, correlation"
+4,Draw some points on a scatterplot that have y = 2 + 3x as their regression line and a correlation less than 0.5.,2,3,0,0.5,linear,"points, regression, correlation"
+5,Create some points with a correlation of 0.6 and then draw your own line that is your guess at the regression line.,,,0.6,0.6,linear,"points, correlation, own2reg"
+5,Create some points with a correlation of -0.5 and then draw your own line that is your guess at the regression line.,,,-0.5,-0.5,linear,"points, correlation, own2reg"
+5,Create some points with a correlation of -0.2 and then draw your own line that is your guess at the regression line.,,,-0.2,-0.2,linear,"points, correlation, own2reg"
+6,Create some points that follow a roughly linear pattern and a correlation of 0.5 and then add an outlier to make the correlation go down to 0.,,,0.5,0.5,linear,"points, relationship, correlation, outlier"

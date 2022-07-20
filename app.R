@@ -1,4 +1,4 @@
-# Load Libraries
+# Load packages ----
 library(shinydashboard)
 library(shiny)
 library(shinyBS)
@@ -6,18 +6,11 @@ library(shinyWidgets)
 library(boastUtils)
 library(ggplot2)
 
-## App Meta Data----------------------------------------------------------------
-APP_TITLE <<- "Regression Lines"
-APP_DESCP  <<- paste(
-  "This app allows a user to explore the relationship between correlation and",
-  "linear regression."
-)
-## End App Meta Data------------------------------------------------------------
 
 # Define global constants and functions ----
-
-# Neil, please help here
-# csv <- read.csv("RegLine.csv")
+minPoints <- 3
+corrTolerances <- c("correct" = 0.1, "partial" = 0.2)
+prompts <- read.csv("challengePrompts.csv", header = TRUE)
 
 # Define the UI ----
 ui <- list(
@@ -31,7 +24,7 @@ ui <- list(
               actionLink("inst", icon("info",class = "myClass"))),
       tags$li(
         class = "dropdown",
-        boastUtils::surveyLink(name = "Regression_Line")),
+        boastUtils::surveyLink(name = "Regression_Lines")),
       tags$li(
         class = 'dropdown',
         tags$a(href = "https://shinyapps.science.psu.edu/",
@@ -42,14 +35,15 @@ ui <- list(
     dashboardSidebar(
       width = 250,
       sidebarMenu(
-        id = "tabs",
+        id = "pages",
         menuItem("Overview", tabName = "overview", icon = icon("tachometer-alt")),
         menuItem("Prerequistes", tabName = "prerequisite", icon = icon("book")),
-        menuItem("Explore", tabName = "explore", icon = icon("wpexplorer")),
+        menuItem("Challenge", tabName = "challenge", icon = icon("cogs")),
         menuItem("References", tabName = "References", icon = icon("leanpub"))
       ),
       tags$div(class = "sidebar-logo",
-               boastUtils::psu_eberly_logo("reversed"))
+               boastUtils::psu_eberly_logo("reversed")
+      )
     ),
     ## Body ----
     dashboardBody(
@@ -98,7 +92,7 @@ ui <- list(
           br(),
           br(),
           br(),
-          div(class = "updated", "Last Update: 9/15/2020 by NJH.")
+          div(class = "updated", "Last Update: 7/20/2022 by NJH.")
           )
         ),
         ### Prerequisites ----
@@ -125,7 +119,7 @@ ui <- list(
              subtracting, multiplying, and/or dividing by the same number,
              the correlation will remain the same."),
             collapsible = TRUE,
-            collapsed = TRUE,
+            collapsed = FALSE,
             width = 12
           ),
           box(
@@ -161,10 +155,98 @@ ui <- list(
             )
           )
         ),
-        ## Challenge ----
+        ### Challenge ----
         tabItem(
-          tabName = "explore",
-          h2("Explore the Regression Line and Correlation"),
+          tabName = "challenge",
+          h2("Scatter plots, Regression Lines, and Correlation"),
+          p("Fill this in with some instructions"),
+          h3("New Layout"),
+          uiOutput(outputId = "challengePrompt"),
+          fluidRow(
+            column(
+              width = 4, 
+              offset = 0,
+              wellPanel(
+                h3("Draw a line"),
+                sliderInput(
+                  inputId = "userIntercept",
+                  label = "Set the intercept",
+                  min = -5,
+                  max = 5,
+                  value = 0,
+                   step = 0.1
+                ),
+                sliderInput(
+                  inputId = "userSlope",
+                  label = "Set the slope",
+                  min = -5,
+                  max = 5,
+                  value = 0,
+                  step = 0.1
+                ),
+                checkboxInput(
+                  inputId = "showUserLine",
+                  label = "Plot your line",
+                  value = FALSE
+                ),
+                h3("Features"),
+                checkboxInput(
+                  inputId = "showCorrelation",
+                  label = "Show correlation of points",
+                  value = FALSE
+                ),
+                uiOutput("userCorrelation"),
+                checkboxInput(
+                  inputId = "showRegression",
+                  label = "Show the linear regression",
+                  value = FALSE
+                ),
+                uiOutput("userRegression"),
+                bsButton(
+                  inputId = "checkInputs",
+                  label = "Check your work",
+                  size = "large"
+                )
+              )
+            ),
+            column(
+              width = 8,
+              offset = 0,
+              plotOutput(
+                outputId = "mainPlot",
+                click = "userPoints",
+                width = "95%"
+              ),
+              hr(),
+              h3("Your Results"),
+              uiOutput("userResults")
+            )
+          ),
+          br(),
+          fluidRow(
+            column(
+              width = 2,
+              offset = 0,
+              bsButton(
+                inputId = "reset",
+                label = "Reset ____",
+                size = "large",
+                style = "danger"
+              )
+            ),
+            column(
+              width = 2,
+              offset = 0,
+              bsButton(
+                inputId = "newPrompt",
+                label = "New challenge",
+                size = "large",
+                icon = icon("forward")
+              )
+            )
+          ),
+          hr(),
+          h3("Old Layout"),
           uiOutput("question", class = "largerFont"),
           br(),
           fluidRow(
@@ -335,110 +417,126 @@ ui <- list(
 # Define the Server ----
 server <- function(input, output,session) {
   ## Info Button ----
-  observeEvent(input$inst,{
-    sendSweetAlert(
-      session = session,
-      title = "Instructions",
-      type = "info",
-      tags$ol(
-        tags$li('Click New Challenge to change a challenge.'),
-        tags$li('Create your own line by entering the values for
+  observeEvent(
+    eventExpr = input$inst,
+    handlerExpr = {
+      sendSweetAlert(
+        session = session,
+        title = "Instructions",
+        type = "info",
+        tags$ol(
+          tags$li('Click New Challenge to change a challenge.'),
+          tags$li('Create your own line by entering the values for
                 both slope and intercept.'),
-        tags$li('Create points by clicking in the plot.'),
-        tags$li('Click RESET to clear both points and regression lines.')
+          tags$li('Create points by clicking in the plot.'),
+          tags$li('Click RESET to clear both points and regression lines.')
+        )
       )
-    )
-  })
+    }
+  )
   
   ## Create Reactive Values ----
   c <- reactiveValues(right = c(sample(1:11,1)))
   val <- reactiveValues(x = NULL, y = NULL)
   
   ## First Go button  ----
-  observeEvent(input$go1, {
-    updateTabItems(
-      session = session,
-      inputId = "tabs",
-      selected = "prerequisite"
-    )
-  })
+  observeEvent(
+    eventExpr = input$go1, 
+    handlerExpr = {
+      updateTabItems(
+        session = session,
+        inputId = "pages",
+        selected = "prerequisite"
+      )
+    }
+  )
   
   ## Second Go button ----
-  observeEvent(input$go2, {
-    updateTabItems(
-      session = session,
-      inputId = "tabs",
-      selected = "explore"
-    )
-  })
+  observeEvent(
+    eventExpr = input$go2, 
+    handlerExpr = {
+      updateTabItems(
+        session = session,
+        inputId = "pages",
+        selected = "challenge"
+      )
+    }
+  )
   
   ## New Challenge button ----
-  observeEvent(input$newchallenge, {
-    ### Reset values
-    c$right <- sample(1:11,1)
-    val$x <- NULL
-    val$y <- NULL
-    
-    ### Update inputs
-    updateSliderInput(
-      session = session,
-      inputId = "slope",
-      value = 0
-    )
-    updateSliderInput(
-      session = session,
-      inputId = "intercept",
-      value = 0
-    )
-    updateCheckboxInput(
-      session = session,
-      inputId ="yourownline",
-      value = FALSE
-    )
-    updateCheckboxInput(
-      session = session,
-      inputId = "correlation",
-      value = FALSE
-    )
-    updateCheckboxInput(
-      session = session,
-      inputId = "regressionline",
-      value = FALSE
-    )
-  })
+  observeEvent(
+    eventExpr = input$newchallenge, 
+    handlerExpr = {
+      ### Reset values
+      c$right <- sample(1:11,1)
+      val$x <- NULL
+      val$y <- NULL
+      
+      ### Update inputs
+      updateSliderInput(
+        session = session,
+        inputId = "slope",
+        value = 0
+      )
+      updateSliderInput(
+        session = session,
+        inputId = "intercept",
+        value = 0
+      )
+      updateCheckboxInput(
+        session = session,
+        inputId ="yourownline",
+        value = FALSE
+      )
+      updateCheckboxInput(
+        session = session,
+        inputId = "correlation",
+        value = FALSE
+      )
+      updateCheckboxInput(
+        session = session,
+        inputId = "regressionline",
+        value = FALSE
+      )
+    }
+  )
+  
   ## Reset Button ----
-  observeEvent(input$clear, {
-    ### Reset values
-    val$x <- NULL
-    val$y <- NULL
-    
-    #Update inputs
-    updateSliderInput(
-      session = session,
-      inputId = "slope",
-      value = 0
-    )
-    updateSliderInput(
-      session = session,
-      inputId = "intercept",
-      value = 0
-    )
-    updateCheckboxInput(
-      session = session,
-      inputId = "yourownline",
-      value = FALSE
-    )
-    updateCheckboxInput(
-      session = session,
-      inputId = "correlation",
-      value = FALSE
-    )
-    updateCheckboxInput(
-      session = session,
-      inputId = "regressionline",
-      value = FALSE
-    )
-  })
+  observeEvent(
+    eventExpr = input$clear, 
+    handlerExpr = {
+      ### Reset values
+      val$x <- NULL
+      val$y <- NULL
+      
+      #Update inputs
+      updateSliderInput(
+        session = session,
+        inputId = "slope",
+        value = 0
+      )
+      updateSliderInput(
+        session = session,
+        inputId = "intercept",
+        value = 0
+      )
+      updateCheckboxInput(
+        session = session,
+        inputId = "yourownline",
+        value = FALSE
+      )
+      updateCheckboxInput(
+        session = session,
+        inputId = "correlation",
+        value = FALSE
+      )
+      updateCheckboxInput(
+        session = session,
+        inputId = "regressionline",
+        value = FALSE
+      )
+    }
+  )
   
   ## User's Linear Equation ----
   output$yourline <- renderText({
@@ -503,7 +601,7 @@ server <- function(input, output,session) {
     }
   })
   
-  # Listen for clicks
+  # Listen for clicks ----
   observe({
     # Initially will be empty
     if (is.null(input$clusterClick)){
@@ -538,7 +636,8 @@ server <- function(input, output,session) {
       if (input$yourownline > 0 ){
         abline(input$intercept, input$slope, col="red", lwd = "3.8")
       }
-      # Feedback for each challenge
+      
+      # Feedback for each challenge ----
       output$feedback<-renderText({
         if (c$right == 1){ # for the first challenge
           # if point is less than 3,
@@ -742,6 +841,395 @@ server <- function(input, output,session) {
       }
     })
   })
+  
+  # Neil's New Work Area ----
+  ## User specific objects ----
+  initialOrder <- sample(
+    x = seq_len(nrow(prompts)),
+    size = nrow(prompts),
+    replace = FALSE
+  )
+  prompts <- prompts[initialOrder, ]
+  
+  promptIndex <- reactiveVal(
+    value = 1,
+    label = "prompt index"
+  )
+  
+  userPoints <- reactiveVal(
+    value = data.frame(
+      x = NULL,
+      y = NULL
+    ),
+    label = "User Points"
+  )
+  
+  ## Listen for points ----
+  observeEvent(
+    eventExpr = input$userPoints,
+    handlerExpr = {
+      userPoints(
+        rbind(
+          userPoints(),
+          data.frame(x = input$userPoints$x, y = input$userPoints$y)
+        )
+      )
+    }
+  )
+  
+  ## Correlation calculation ----
+  obsCorr <- eventReactive(
+    eventExpr = userPoints(),
+    valueExpr = {
+      ifelse(
+        test = nrow(userPoints()) < minPoints,
+        yes = NA,
+        no = cor(
+          x = userPoints()$x,
+          y = userPoints()$y,
+          method = "pearson"
+        )
+      )
+    }
+  )
+  
+  ## Correlation display ----
+  observeEvent(
+    eventExpr = c(input$showCorrelation, obsCorr()),
+    handlerExpr = {
+      message <- ifelse(
+        test = is.na(obsCorr()),
+        yes = "You need to add more points to the plot.",
+        no = paste0("The correlation for your plotted points is ",
+                   round(x = obsCorr(), digits = 3), ".")
+      )
+      
+      if (input$showCorrelation) {
+        output$userCorrelation <- renderUI({p(message)})
+      } else {
+        output$userCorrelation <- renderUI({})
+      }
+    }
+  )
+  
+  ## Regression ----
+  regModel <- eventReactive(
+    eventExpr = userPoints(),
+    valueExpr = {
+      ifelse(
+        test = nrow(userPoints()) < minPoints,
+        yes = NA,
+        no = lm(y ~ x, data = userPoints())
+      )
+    }
+  )
+  
+  ## Regression display ----
+  observeEvent(
+    eventExpr = c(input$showRegression, userPoints()),
+    handlerExpr = {
+      message <- ifelse(
+        test = is.na(regModel()),
+        yes = "You need to add more points to the plot.",
+        no = paste0(
+          "The equation of the linear regression model for your points is y = ",
+          round(x = regModel()[[1]][1], digits = 3), " + ",
+          round(x = regModel()[[1]][2], digits = 3), "*x."
+        )
+      )
+      
+      if (input$showRegression) {
+        output$userRegression <- renderUI({p(message)})
+      } else {
+        output$userRegression <- renderUI({})
+      }
+    }
+  )
+  
+  
+  ## Display the prompt ----
+  output$challengePrompt <- renderUI(
+    expr = {
+      p(prompts$prompt[promptIndex()])
+    }
+  )
+  
+  ## Get new challenge ----
+  observeEvent(
+    eventExpr = input$newPrompt,
+    handlerExpr = {
+      if (promptIndex() < nrow(prompts)) {
+        promptIndex(promptIndex() + 1)
+      } else {
+        sendSweetAlert(
+          session = session,
+          title = "Reshuffling Challenges",
+          type = "info",
+          text = "You've gone through all of the existing challenges. We'll
+          reshuffle them so you can keep working."
+        )
+        newOrder <- sample(
+          x = seq_len(nrow(prompts)),
+          size = nrow(prompts),
+          replace = FALSE
+        )
+        prompts <- prompts[newOrder, ]
+        promptIndex(1)
+      }
+      ### Still need to add in the reset of points and controls.
+    }
+  )
+  
+  
+  ## Display the main plot ----
+  output$mainPlot <- renderPlot(
+    expr = {
+      basePlot <- ggplot(
+        data = data.frame(x = -10:10, y = -10:10),
+        mapping = aes(x = x, y = y)
+      ) +
+        theme_bw() +
+        theme(
+          text = element_text(size = 18),
+          legend.position = "bottom"
+        ) +
+        scale_color_manual(
+          name = "Plotted lines",
+          values = c("User Line" = psuPalette[2], "Regression" = psuPalette[1])
+        ) +
+        scale_x_continuous(
+          limits = c(-10, 10),
+          expand = expansion(mult = 0, add = 0)
+        ) + 
+        scale_y_continuous(
+          limits = c(-10, 10),
+          expand = expansion(mult = 0, add = 0)
+        )
+      
+      ### Add the user's line
+      if (input$showUserLine) {
+        linePlot <- basePlot +
+          stat_function(
+            mapping = aes(color = "User Line"),
+            fun = function(x) {
+              return(input$userIntercept + input$userSlope * x)
+            },
+            size = 1,
+            na.rm = TRUE
+          )
+      } else {
+        linePlot <- basePlot
+      }
+      
+      ### Add Points
+      if (!is.null(userPoints()) & nrow(userPoints()) >= 1) {
+        pointsPlot <- linePlot +
+          geom_point(
+            data = userPoints(),
+            mapping = aes(x = x, y = y),
+            size = 3,
+            fill = psuPalette[1],
+            color = psuPalette[1]
+          )
+      } else {
+        pointsPlot <- linePlot
+      }
+      
+      ### Add regression
+      if (input$showRegression & nrow(userPoints()) >= minPoints) {
+        graphedPlot <- pointsPlot +
+          geom_smooth(
+            data = userPoints(),
+            mapping = aes(x = x , y = y, color = "Regression"),
+            formula = y ~ x,
+            method = "lm",
+            se = FALSE
+          )
+      } else {
+        graphedPlot <- pointsPlot
+      }
+      
+      graphedPlot
+    },
+    alt = "FILL IN"
+  )
+  
+  ## Setting up feedback fields ----
+  feedback <- reactiveValues(
+    points = list(message = "filler", icon = "partial"),
+    ownLine = list(message = "filler", icon = "partial"),
+    correlation = list(message = "filler", icon = "partial"),
+    regression = list(message = "filler", icon = "partial"),
+    relationship = list(message = "filler", icon = "partial"),
+    own2reg = list(message = "filler", icon = "partial"),
+    outlier = list(message = "filler", icon = "partial")
+  )
+  
+  ## Adjust feedback to match current challenge prompt ----
+  observeEvent(
+    eventExpr = promptIndex(),
+    handlerExpr = {
+      checks <- strsplit(x = prompts$checkList[promptIndex()], split = ", ")[[1]]
+      for (i in 1:length(names(feedback))) {
+        if (names(feedback)[i] %in% checks) {
+          feedback[[names(feedback)[i]]] <- list(
+            message = "Not yet met",
+            icon = "incorrect"
+          )
+        } else {
+          feedback[[names(feedback)[i]]] <- list(
+            message = "Not applicable in this challenge",
+            icon = ""
+          )
+        }
+      }
+    }
+  )
+  
+  ## Display User Results ----
+  output$userResults <- renderUI(
+    expr = {
+      tags$table(
+        role = "presentation",
+        rules = "all",
+        border = "1pt",
+        align = "left",
+        # width = "100%",
+        tags$caption("Results by Element"),
+        tags$thead(
+          tags$tr(
+            tags$th("Element"),
+            tags$th("Feedback")
+          )
+        ),
+        tags$tbody(
+          tags$tr(
+            tags$td("Points"),
+            tags$td(renderIcon(feedback$points$icon), feedback$points$message)
+          ),
+          tags$tr(
+            tags$td("Drawn Line"),
+            tags$td(renderIcon(feedback$ownLine$icon), feedback$ownLine$message)
+          ),
+          tags$tr(
+            tags$td("Correlation"),
+            tags$td(renderIcon(feedback$correlation$icon), feedback$correlation$message)
+          ),
+          tags$tr(
+            tags$td("Observed Regression Line"),
+            tags$td(renderIcon(feedback$regression$icon), feedback$regression$message)
+          ),
+          tags$tr(
+            tags$td("Relationship Type"),
+            tags$td(renderIcon(feedback$relationship$icon), feedback$relationship$message)
+          ),
+          tags$tr(
+            tags$td("Regression compared to Target"),
+            tags$td(renderIcon(feedback$own2reg$icon), feedback$own2reg$message)
+          ),
+          tags$tr(
+            tags$td("Outlier"),
+            tags$td(renderIcon(feedback$outlier$icon), feedback$outlier$message)
+          )
+        )
+      )
+    }
+  )
+  
+  ## Checking user's work ----
+  observeEvent(
+    eventExpr = input$checkInputs,
+    handlerExpr = {
+      ### Get list of checks for prompt ----
+      checks <- strsplit(x = prompts$checkList[promptIndex()], split = ", ")[[1]]
+      
+      #### Check of points ----
+      if ("points" %in% checks) {
+        if (nrow(userPoints()) >= minPoints) {
+          feedback$points <- list(
+            message = "You have enough points",
+            icon = "correct"
+          )
+        } else {
+          feedback$points <- list(
+            message = "Keep clicking on the plot to add more points.",
+            icon = "incorrect"
+          )
+        }
+      }
+      
+      #### Check of drawn line ----
+      if ("ownLine" %in% checks) {
+        if (input$userSlope == prompts$slope[promptIndex()] &
+            input$userIntercept == prompts$intercept[promptIndex()] &
+            input$showUserLine) {
+          feedback$ownLine <- list(
+            message = "You've drawn the correct line",
+            icon = "correct"
+          )
+        } else if (input$userSlope == prompts$slope[promptIndex()] &
+                   input$userIntercept == prompts$intercept[promptIndex()] &
+                   !input$showUserLine) {
+          feedback$ownLine <- list(
+            message = "Remember to check the Plot your line box to make the line
+            appear.",
+            icon = "correct"
+          )
+        } else if (input$userSlope != prompts$slope[promptIndex()] &
+                   input$userIntercept == prompts$intercept[promptIndex()] &
+                   input$showUserLine) {
+          feedback$ownLine <- list(
+            message = "You have wrong slope for your line.",
+            icon = "partial"
+          )
+        } else if (input$userSlope == prompts$slope[promptIndex()] &
+                   input$userIntercept != prompts$intercept[promptIndex()] &
+                   input$showUserLine) {
+          feedback$ownLine <- list(
+            message = "You have wrong intercept for your line.",
+            icon = "partial"
+          )
+        } else {
+          feedback$ownLine <- list(
+            message = "You don't have the correct line set up. Refer to the prompt
+            for the correct values of the intercept and slope.",
+            icon = "incorrect"
+          )
+        }
+      }
+      
+      #### Check correlation ----
+      if ("correlation" %in% checks) {
+        if (is.na(obsCorr())) {
+          feedback$correlation <- list(
+            message = "You need to plot more points.",
+            icon = "incorrect"
+          )
+        } else if (sign(obsCorr()) != sign(prompts$correlation1[promptIndex()])) {
+          feedback$correlation <- list(
+            message = "Your points have the opposite relationship than requested.",
+            icon = "incorrect"
+          )
+        } else if (abs(obsCorr() - prompts$correlation1[promptIndex()]) <= corrTolerances[1]) {
+          feedback$correlation <- list(
+            message = "Your correlation is close enough to the target.",
+            icon = "correct"
+          )
+        } else if (abs(obsCorr() - prompts$correlation1[promptIndex()]) <= corrTolerances[2]) {
+          feedback$correlation <- list(
+            message = "Your correlation almost there. Try adding a few more points.",
+            icon = "partial"
+          )
+        } else {
+          feedback$correlation <- list(
+            message = "Your correlation value is a too far off. Try adding
+              more points or use the Reset button to start this challenge over.",
+            icon = "incorrect"
+          )
+        }
+      }
+    }
+  )
 }
 
 # Boast App Call ----

@@ -1,6 +1,6 @@
 Title: Regression Lines
 ShortName: Regression Lines
-Date: 2022-06-06
+Date: 2017-08-01
 Lifecycle: experimental
 Authors@R: c(
     person(given = "Caihui", family = "Xiao", role = c("aut", "cre")),
@@ -15,8 +15,8 @@ LearningObjectives: c(
     "The student will learn to understand Concept B as description y."
   )
 DisplayMode: Normal
-URL: https://psu-eberly.shinyapps.io/Sample_App
-BugReports: https://github.com/EducationShinyAppTeam/Sample_App/issues
+URL: https://psu-eberly.shinyapps.io/Regression_Lines
+BugReports: https://github.com/EducationShinyAppTeam/Regression_Lines/issues
 License: CC-BY-NC-SA-4.0
 Tags: simulation
 Type: Shiny
