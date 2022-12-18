@@ -229,7 +229,7 @@ ui <- list(
               offset = 0,
               bsButton(
                 inputId = "reset",
-                label = "Reset ____",
+                label = "Reset plot and slider",
                 size = "large",
                 style = "danger"
               )
