@@ -1051,7 +1051,7 @@ server <- function(input, output,session) {
       
       graphedPlot
     },
-    alt = "FILL IN"
+    alt = "Empty plot for users to fill in / draw points to answer the questions."
   )
   
   ## Setting up feedback fields ----
