@@ -6,44 +6,43 @@ library(shinyWidgets)
 library(boastUtils)
 library(ggplot2)
 
-## App Meta Data----------------------------------------------------------------
-APP_TITLE <<- "Regression Lines"
-APP_DESCP  <<- paste(
-  "This app allows a user to explore the relationship between correlation and",
-  "linear regression."
-)
-## End App Meta Data------------------------------------------------------------
-
 # Define global constants and functions ----
 
 # Define the UI ----
 ui <- list(
+  ## app page ----
   dashboardPage(
     skin = "yellow",
-    ## Header ----
     dashboardHeader(
       titleWidth = 250,
-      title = "Regression Lines",
-      tags$li(class = "dropdown",
-              actionLink("inst", icon("info",class = "myClass"))),
+      title = "Effect of Outliers",
+      tags$li(class = "dropdown", actionLink("info", icon("info"))),
       tags$li(
-        class = 'dropdown',
-        tags$a(href = "https://shinyapps.science.psu.edu/",
-               icon('home', lib = 'font-awesome'))
+        class = "dropdown",
+        boastUtils::surveyLink(name = "Regression_lines")
+      ),
+      tags$li(
+        class = "dropdown",
+        tags$a(
+          href = 'https://shinyapps.science.psu.edu/',
+          icon("house")
+        )
       )
     ),
     ## Sidebar ----
     dashboardSidebar(
       width = 250,
       sidebarMenu(
-        id = "tabs",
-        menuItem("Overview", tabName = "overview", icon = icon("tachometer-alt")),
-        menuItem("Prerequistes", tabName = "prerequisite", icon = icon("book")),
-        menuItem("Explore", tabName = "explore", icon = icon("wpexplorer")),
+        id = "pages",
+        menuItem("Overview", tabName = "overview", icon = icon("gauge-high")),
+        menuItem("Prerequistes", tabName = "prerequisites", icon = icon("book")),
+        menuItem("Challenge", tabName = "challenge", icon = icon("gears")),
         menuItem("References", tabName = "References", icon = icon("leanpub"))
       ),
-      tags$div(class = "sidebar-logo",
-               boastUtils::psu_eberly_logo("reversed"))
+      tags$div(
+        class = "sidebar-logo",
+        boastUtils::sidebarFooter()
+      )
     ),
     ## Body ----
     dashboardBody(
@@ -68,37 +67,42 @@ ui <- list(
               "Show the regression line to compute and display
              the regression line."
             ),
-            tags$li("Click RESET to clear both points and regression lines.")
+            tags$li("Click 'RESET' to clear both points and regression lines.")
           ),
           br(),
           div(
             style = "text-align: center;",
             bsButton(
-              inputId = "go1",
-              label = "GO!",
-              icon = icon("bolt"),
+              inputId = "goToPrereq",
+              label = "Prerequisites!",
+              icon = icon("book"),
               size = "large",
             )
           ),
-          #Acknowledgement
+          #Acknowledgements
           br(),
           br(),
           h2("Acknowledgements"),
           p(
             "This app was developed and coded by Caihui Xiao.
-          The app was further updated by Zhiliang Zhang and Jiajun Gao
-          in June 2018 and by Daehoon Gwak in July 2020.
-          Special thanks to Sitong Liu for help on some programming issues.",
+            The app was further updated by Zhiliang Zhang and Jiajun Gao
+            in June 2018 and by Daehoon Gwak in July 2020.
+            Special thanks to Sitong Liu for help on some programming issues.",
             br(),
             br(),
             br(),
-            div(class = "updated", "Last Update: 9/15/2020 by NJH.")
+            "Cite this app as:",
+            br(),
+            citeApp(),
+            br(),
+            br(),
+            div(class = "updated", "Last Update: 6/15/2023 by SB.")
           )
         ),
         ### Prerequisites ----
         tabItem(
           withMathJax(),
-          tabName = "prerequisite",
+          tabName = "prerequisites",
           h2("Prerequisites"),
           br(),
           box(
@@ -148,16 +152,16 @@ ui <- list(
           div(
             style = "text-align: center;",
             bsButton(
-              inputId = "go2",
-              label = "GO!",
+              inputId = "goToChallenge",
+              label = "Challenge!",
               icon("bolt"),
               size = "large"
             )
           )
         ),
-        ## Challenge ----
+        ### Challenge ----
         tabItem(
-          tabName = "explore",
+          tabName = "challenge",
           h2("Explore the Regression Line and Correlation"),
           uiOutput("question", class = "largerFont"),
           br(),
@@ -165,7 +169,7 @@ ui <- list(
             column(
               width = 1,
               bsButton(
-                inputId = "newchallenge",
+                inputId = "newChallenge",
                 label = "New Challenge",
                 size = "large"
               )
@@ -174,7 +178,7 @@ ui <- list(
               width = 1,
               offset = 5,
               bsButton(
-                inputId = "clear",
+                inputId = "reset",
                 label = "Reset",
                 size = "large",
                 style = "danger"
@@ -186,7 +190,7 @@ ui <- list(
             column(
               width = 3,
               checkboxInput(
-                inputId = "yourownline",
+                inputId = "yourOwnLine",
                 label = "Create your own line (Red)",
                 value = FALSE
               )
@@ -219,7 +223,7 @@ ui <- list(
             column(
               width = 4,
               checkboxInput(
-                inputId = "regressionline",
+                inputId = "regressionLine",
                 label = "Show regression line (black)",
                 value =  FALSE
               )
@@ -260,12 +264,12 @@ ui <- list(
               br(),
               br(),
               conditionalPanel(
-                condition = "input.yourownline !=0",
+                condition = "input.yourOwnLine !=0",
                 textOutput('yourline')
               ),
               br(),
               conditionalPanel(
-                condition = "input.regressionline !=0",
+                condition = "input.regressionLine !=0",
                 textOutput('regression_equation')
               ),
               br(),
@@ -329,413 +333,481 @@ ui <- list(
 # Define the Server ----
 server <- function(input, output,session) {
   ## Info Button ----
-  observeEvent(input$inst,{
-    sendSweetAlert(
-      session = session,
-      title = "Instructions",
-      type = "info",
-      tags$ol(
-        tags$li('Click New Challenge to change a challenge.'),
-        tags$li('Create your own line by entering the values for
+  observeEvent(
+    eventExpr = input$info,
+    handlerExpr = {
+      sendSweetAlert(
+        session = session,
+        title = "Instructions",
+        type = "info",
+        tags$ol(
+          tags$li('Click New Challenge to change a challenge.'),
+          tags$li('Create your own line by entering the values for
                 both slope and intercept.'),
-        tags$li('Create points by clicking in the plot.'),
-        tags$li('Click RESET to clear both points and regression lines.')
+          tags$li('Create points by clicking in the plot.'),
+          tags$li('Click RESET to clear both points and regression lines.')
+        )
       )
-    )
-  })
+    }
+  )
 
   ## Create Reactive Values ----
   c <- reactiveValues(right = c(sample(1:11,1)))
   val <- reactiveValues(x = NULL, y = NULL)
 
-  ## First Go button  ----
-  observeEvent(input$go1, {
-    updateTabItems(
-      session = session,
-      inputId = "tabs",
-      selected = "prerequisite"
-    )
-  })
-
-  ## Second Go button ----
-  observeEvent(input$go2, {
-    updateTabItems(
-      session = session,
-      inputId = "tabs",
-      selected = "explore"
-    )
-  })
+  ## Prerequisites button  ----
+  observeEvent(
+    eventExpr = input$goToPrereq, 
+    handlerExpr = {
+      updateTabItems(
+        session = session,
+        inputId = "pages",
+        selected = "prerequisites"
+      )
+    }
+  )
+  
+  ## Explore button ----
+  observeEvent(
+    eventExpr = input$goToChallenge, 
+    handlerExpr = {
+      updateTabItems(
+        session = session,
+        inputId = "pages",
+        selected = "challenge"
+      )
+    }
+  )
 
   ## New Challenge button ----
-  observeEvent(input$newchallenge, {
-    ### Reset values
-    c$right <- sample(1:11,1)
-    val$x <- NULL
-    val$y <- NULL
-
-    ### Update inputs
-    updateSliderInput(
-      session = session,
-      inputId = "slope",
-      value = 0
-    )
-    updateSliderInput(
-      session = session,
-      inputId = "intercept",
-      value = 0
-    )
-    updateCheckboxInput(
-      session = session,
-      inputId ="yourownline",
-      value = FALSE
-    )
-    updateCheckboxInput(
-      session = session,
-      inputId = "correlation",
-      value = FALSE
-    )
-    updateCheckboxInput(
-      session = session,
-      inputId = "regressionline",
-      value = FALSE
-    )
-  })
+  observeEvent(
+    eventExpr = input$newChallenge,
+    handlerExpr = {
+      ### Reset values
+      c$right <- sample(1:11,1)
+      val$x <- NULL
+      val$y <- NULL
+      
+      ### Update inputs
+      updateSliderInput(
+        session = session,
+        inputId = "slope",
+        value = 0
+      )
+      updateSliderInput(
+        session = session,
+        inputId = "intercept",
+        value = 0
+      )
+      updateCheckboxInput(
+        session = session,
+        inputId = "yourOwnLine",
+        value = FALSE
+      )
+      updateCheckboxInput(
+        session = session,
+        inputId = "correlation",
+        value = FALSE
+      )
+      updateCheckboxInput(
+        session = session,
+        inputId = "regressionLine",
+        value = FALSE
+      )
+    }
+  )
+  
   ## Reset Button ----
-  observeEvent(input$clear, {
-    ### Reset values
-    val$x <- NULL
-    val$y <- NULL
-
-    #Update inputs
-    updateSliderInput(
-      session = session,
-      inputId = "slope",
-      value = 0
-    )
-    updateSliderInput(
-      session = session,
-      inputId = "intercept",
-      value = 0
-    )
-    updateCheckboxInput(
-      session = session,
-      inputId = "yourownline",
-      value = FALSE
-    )
-    updateCheckboxInput(
-      session = session,
-      inputId = "correlation",
-      value = FALSE
-    )
-    updateCheckboxInput(
-      session = session,
-      inputId = "regressionline",
-      value = FALSE
-    )
-  })
+  observeEvent(
+    eventExpr = input$reset,
+    handlerExpr = {
+      ### Reset values
+      val$x <- NULL
+      val$y <- NULL
+      
+      #Update inputs
+      updateSliderInput(
+        session = session,
+        inputId = "slope",
+        value = 0
+      )
+      updateSliderInput(
+        session = session,
+        inputId = "intercept",
+        value = 0
+      )
+      updateCheckboxInput(
+        session = session,
+        inputId = "yourOwnLine",
+        value = FALSE
+      )
+      updateCheckboxInput(
+        session = session,
+        inputId = "correlation",
+        value = FALSE
+      )
+      updateCheckboxInput(
+        session = session,
+        inputId = "regressionLine",
+        value = FALSE
+      )
+    }
+  )
 
   ## User's Linear Equation ----
-  output$yourline <- renderText({
-    paste("Equation of your line: y =",
-          input$intercept,"+", "(", input$slope,")", "* x")
-  })
+  output$yourline <- renderText(
+    expr = {
+      paste(
+        "Equation of your line: y =",
+        input$intercept,
+        "+", 
+        "(",
+        input$slope,
+        ")", "
+        * x"
+      )
+    }
+  )
 
   # REVISE Generate and Display Questions ----
-  output$question <- renderText({
-    if (c$right == 1){
-      "Challenge: Draw some points on a scatterplot that have y = 3 – 2x
+  output$question <- renderText(
+    expr = {
+      if (c$right == 1) {
+        "Challenge: Draw some points on a scatterplot that have y = 3 – 2x
       as their regression and a correlation more than - 0.8.
       (Check the “Regression line” box to see how you did.)"
-    }
-    else if  (c$right == 2){
-      "Challenge: Draw some points on a scatterplot that have y = 2 + 3x
+      }
+      else if  (c$right == 2) {
+        "Challenge: Draw some points on a scatterplot that have y = 2 + 3x
       as their regression and a correlation less than 0.5.
       (Check the “Regression line” box to see how you did.)"
-    }
-    else if  (c$right == 3){
-      "Challenge: Draw some points on a scatterplot that have y = 2x + 1
+      }
+      else if  (c$right == 3) {
+        "Challenge: Draw some points on a scatterplot that have y = 2x + 1
       as their regression. (Check the “Show regression”
       box to see how you did.)"
-    }
-    else if  (c$right == 4){
-      "Challenge: Draw your own line with the equation y = 3 – 2x
+      }
+      else if  (c$right == 4) {
+        "Challenge: Draw your own line with the equation y = 3 – 2x
       and then add some points that have that as their regression.
       (Check the “Show regression” box to see how you did.)"
-    }
-    else if  (c$right == 5){
-      "Challenge: Draw your own line with the equation y = 2 + 3x
+      }
+      else if  (c$right == 5) {
+        "Challenge: Draw your own line with the equation y = 2 + 3x
       and then add some points that have that as their regression.
       (Check the “Show regression” box to see how you did.)"
-    }
-    else if  (c$right == 6){
-      "Challenge: Create some points with a correlation of 0.6
+      }
+      else if  (c$right == 6) {
+        "Challenge: Create some points with a correlation of 0.6
       and then draw your own line that is your guess at the regression line.
       (Check the “Show regression” box to see how you did.)"
-    }
-    else if  (c$right == 7){
-      "Challenge: Create some points with a correlation of -0.5 and
+      }
+      else if  (c$right == 7) {
+        "Challenge: Create some points with a correlation of -0.5 and
       then draw your own line that is your guess at the regression line.
       (Check the “Show regression” box to see how you did.)"
-    }
-    else if  (c$right == 8){
-      "Challenge: create some points with a correlation of -0.2
+      }
+      else if  (c$right == 8) {
+        "Challenge: create some points with a correlation of -0.2
       and then draw your own line that is your guess at the regression line.
       (Check the “Show regression” box to see how you did.)"
-    }
-    else if  (c$right == 9){
-      "Challenge: Create some points that have a strong non-linear relationship,
+      }
+      else if  (c$right == 9) {
+        "Challenge: Create some points that have a strong non-linear relationship,
       but a correlation between -0.1 and 0.1."
-    }
-    else if  (c$right == 10){
-      "Challenge: Create some points that have a strong non-linear relationship,
+      }
+      else if  (c$right == 10) {
+        "Challenge: Create some points that have a strong non-linear relationship,
       but a correlation between 0.4 and 0.6."
-    }
-    else if  (c$right == 11){
-      "Challenge: Create some points that follow a roughly linear pattern
+      }
+      else if  (c$right == 11) {
+        "Challenge: Create some points that follow a roughly linear pattern
       and a correlation of 0.5 and then add an outlier to make
       the correlation go down to 0."
+      }
     }
-  })
-
+  )
+  
   # Listen for clicks
-  observe({
-    # Initially will be empty
-    if (is.null(input$clusterClick)){
-      return()
+  observe(
+    x = {
+      # Initially will be empty
+      if (is.null(input$clusterClick)) {
+        return()
+      }
+      isolate(
+        expr = {
+          val$x <- c(val$x, input$clusterClick$x)
+          val$y <- c(val$y, input$clusterClick$y)
+        }
+      )
     }
-    isolate({
-      val$x <- c(val$x, input$clusterClick$x)
-      val$y <- c(val$y, input$clusterClick$y)
-    })
-  })
-  output$clusterPlot <- renderPlot({
-    tryCatch({
-      # Format the data as a matrix
-      data1 <- data.frame(c(val$x, val$y), ncol = 2)
-      # Try to cluster
-      if (length(val$x) <= 1){
-        stop("We can't cluster less than 2 points")
-      }
-      suppressWarnings({
-        fit <- Mclust(data)
-      })
-      mclust2Dplot(data = data1, what = "classification",
-                   classification = fit$classification, main = FALSE,
-                   xlim = c(-2,2), ylim = c(-0.2,5),
-                   cex = 1.5,
-                   cex.lab = 1.5)
-    }, error = function(warn){
-      # Otherwise just plot the points and instructions
-      plot(val$x, val$y, xlim = c(-5, 5), ylim = c(-0.2, 5), xlab = "X",
-           ylab = "Y", cex = 1.5, cex.lab = 1.5,
-           cex.axis = 1.5, pch = 16, col = "blue")
-      if (input$yourownline > 0 ){
-        abline(input$intercept, input$slope, col="red", lwd = "3.8")
-      }
-      # Feedback for each challenge
-      output$feedback<-renderText({
-        if (c$right == 1){ # for the first challenge
-          # if point is less than 3,
-          if (length(val$x) < 3 | is.null(val$x) == TRUE){
-            paste("Please click to add more points.")
+  )
+  output$clusterPlot <- renderPlot(
+    expr = {
+      tryCatch(
+        expr = {
+          # Format the data as a matrix
+          data1 <- data.frame(c(val$x, val$y), ncol = 2)
+          # Try to cluster
+          if (length(val$x) <= 1) {
+            stop("We can't cluster less than 2 points")
           }
-          # if the points is greater or equal than 3
-          # and correlation is greater than -0.8,
-          else if (length(val$x) >= 3 & round(cor(val$x,val$y),
-                                              digits = 2) > -0.8){
-            paste("The correlation is correct!
+          suppressWarnings(
+            expr = {
+              fit <- Mclust(data)
+            }
+          )
+          mclust2Dplot(
+            data = data1, 
+            what = "classification",
+            classification = fit$classification, 
+            main = FALSE,
+            xlim = c(-2,2), ylim = c(-0.2,5),
+            cex = 1.5,
+            cex.lab = 1.5
+          )
+        }, error = function(warn){
+          # Otherwise just plot the points and instructions
+          plot(val$x, val$y, xlim = c(-5, 5), ylim = c(-0.2, 5), xlab = "X",
+               ylab = "Y", cex = 1.5, cex.lab = 1.5,
+               cex.axis = 1.5, pch = 16, col = boastUtils::boastPalette[1])
+          if (input$yourOwnLine > 0 ) {
+            abline(
+              input$intercept, 
+              input$slope, 
+              col = boastUtils::psuPalette[2], 
+              lwd = "3.8"
+            )
+          }
+          # Feedback for each challenge
+          output$feedback <- renderText(
+            expr = {
+              if (c$right == 1) { # for the first challenge
+                # if point is less than 3,
+                if (length(val$x) < 3 | is.null(val$x) == TRUE) {
+                  paste("Please click to add more points.")
+                }
+                # if the points is greater or equal than 3
+                # and correlation is greater than -0.8,
+                else if (length(val$x) >= 3 & round(cor(val$x,val$y),
+                                                    digits = 2) > -0.8) {
+                  paste("The correlation is correct!
                   Please check the “Regression line” box to see
                   how you did for regression.")
-          }
-          # if the points is greater or equal than 3
-          # and correlation is less than -0.8,
-          else if(length(val$x) >= 3 & round(cor(val$x, val$y),
-                                             digits = 2) <= -0.8){
-            paste("Sorry, correlation <= -0.8.",
-                  "Please add other points or try again for the correlation.",
-                  "Please check the “Regression line” box to see
+                }
+                # if the points is greater or equal than 3
+                # and correlation is less than -0.8,
+                else if (length(val$x) >= 3 & round(cor(val$x, val$y),
+                                                    digits = 2) <= -0.8) {
+                  paste("Sorry, correlation <= -0.8.",
+                        "Please add other points or try again for the correlation.",
+                        "Please check the “Regression line” box to see
                   how you did for regression")
-          }
-        }
-        else if(c$right == 2){
-          if(length(val$x) < 3 | is.null(val$x) == TRUE){
-            paste("Please click to add more points.")
-          }
-          else if (length(val$x) >= 3 & round(cor(val$x, val$y),
-                                              digits = 2) < 0.5){
-            paste("The correlation is correct!",
-                  "Please check the “Regression line” box to see
+                }
+              }
+              else if (c$right == 2) {
+                if (length(val$x) < 3 | is.null(val$x) == TRUE) {
+                  paste("Please click to add more points.")
+                }
+                else if (length(val$x) >= 3 & round(cor(val$x, val$y),
+                                                    digits = 2) < 0.5) {
+                  paste("The correlation is correct!",
+                        "Please check the “Regression line” box to see
                   how you did for regression")
-          }
-          else if(length(val$x) >= 3 & round(cor(val$x,val$y),
-                                             digits = 2) >= 0.5){
-            paste("Sorry, correlation >= 0.5.",
-                  "Please add other points or try again for the correlation.",
-                  "Please check the “Regression line” box to see
+                }
+                else if (length(val$x) >= 3 & round(cor(val$x,val$y),
+                                                    digits = 2) >= 0.5) {
+                  paste("Sorry, correlation >= 0.5.",
+                        "Please add other points or try again for the correlation.",
+                        "Please check the “Regression line” box to see
                   how you did for regression")
-          }
-        }
-        else if (c$right == 3){
-          if(length(val$x) < 3 | is.null(val$x) == TRUE){
-            paste("Please click to add more points.")
-          }
-          else if (length(val$x) >= 3){
-            paste("Please check the “Show regression” box to see
+                }
+              }
+              else if (c$right == 3) {
+                if (length(val$x) < 3 | is.null(val$x) == TRUE) {
+                  paste("Please click to add more points.")
+                }
+                else if (length(val$x) >= 3) {
+                  paste("Please check the “Show regression” box to see
                   how you did for regression")
-          }
-        }
-        else if (c$right == 4){
-          if(is.null(val$x) == TRUE){
-            paste("Please draw the line first.")
-          }
-          else if (length(val$x) < 3){
-            paste("Please add more points ")
-          }
-          else if (length(val$x >= 3)){
-            paste("Please check the “Show regression” box to see
+                }
+              }
+              else if (c$right == 4) {
+                if (is.null(val$x) == TRUE) {
+                  paste("Please draw the line first.")
+                }
+                else if (length(val$x) < 3) {
+                  paste("Please add more points ")
+                }
+                else if (length(val$x >= 3)) {
+                  paste("Please check the “Show regression” box to see
                   how well do the lines match")
-          }
-        }
-        else if (c$right == 5){
-          if(is.null(val$x) == TRUE){
-            paste("Please draw the line first.")
-          }
-          else if (length(val$x) < 3){
-            paste("Please add more points ")
-          }
-          else if (length(val$x >= 3)){
-            paste("Please check the “Show regression” box to see
+                }
+              }
+              else if (c$right == 5) {
+                if (is.null(val$x) == TRUE) {
+                  paste("Please draw the line first.")
+                }
+                else if (length(val$x) < 3) {
+                  paste("Please add more points ")
+                }
+                else if (length(val$x >= 3)) {
+                  paste("Please check the “Show regression” box to see
                   how well do the lines match")
-          }
-        }
-        else if (c$right == 6){
-          if (length(val$x) < 3 | is.null(val$x) == TRUE){
-            paste("Please click to add more points.")
-          }
-          else if (length(val$x) >= 3 & round(cor(val$x, val$y),
-                                              digits = 1) == 0.6){
-            paste("The correlation is correct!",
-                  "Please guess and draw the regression line.",
-                  "Then check the “Regression line” box to see how you did.")
-          }
-          else if(length(val$x) >= 3 & round( cor(val$x, val$y),
-                                              digits = 1) != 0.6){
-            paste("Sorry, correlation is not equal to 0.6.",
-                  "Please add other points or try again for the correlation.",
-                  "You can check the “Show correlation value” box
+                }
+              }
+              else if (c$right == 6) {
+                if (length(val$x) < 3 | is.null(val$x) == TRUE) {
+                  paste("Please click to add more points.")
+                }
+                else if (length(val$x) >= 3 & round(cor(val$x, val$y),
+                                                    digits = 1) == 0.6) {
+                  paste("The correlation is correct!",
+                        "Please guess and draw the regression line.",
+                        "Then check the “Regression line” box to see how you did.")
+                }
+                else if (length(val$x) >= 3 & round( cor(val$x, val$y),
+                                                     digits = 1) != 0.6) {
+                  paste("Sorry, correlation is not equal to 0.6.",
+                        "Please add other points or try again for the correlation.",
+                        "You can check the “Show correlation value” box
                   to see the current correlation.")
-          }
-        }
-        else if (c$right == 7){
-          if (length(val$x) < 3 | is.null(val$x) == TRUE){
-            paste("Please click to add more points.")
-          }
-          else if (length(val$x) >= 3 & round(cor(val$x, val$y),
-                                              digits = 1) == -0.5){
-            paste("The correlation is correct!",
-                  "Please guess and draw the regression line.",
-                  "Then check the “Regression line” box to see how you did.")
-          }
-          else if(length(val$x) >= 3 & round(cor(val$x, val$y),
-                                             digits = 1) != -0.5){
-            paste("Sorry, correlation is not equal to -0.5.",
-                  "Please add other points or try again for the correlation.",
-                  "You can check the “Show correlation value” box
+                }
+              }
+              else if (c$right == 7) {
+                if (length(val$x) < 3 | is.null(val$x) == TRUE) {
+                  paste("Please click to add more points.")
+                }
+                else if (length(val$x) >= 3 & round(cor(val$x, val$y),
+                                                    digits = 1) == -0.5) {
+                  paste("The correlation is correct!",
+                        "Please guess and draw the regression line.",
+                        "Then check the “Regression line” box to see how you did.")
+                }
+                else if (length(val$x) >= 3 & round(cor(val$x, val$y),
+                                                    digits = 1) != -0.5) {
+                  paste("Sorry, correlation is not equal to -0.5.",
+                        "Please add other points or try again for the correlation.",
+                        "You can check the “Show correlation value” box
                   to see the current correlation.")
-          }
-        }
-        else if (c$right == 8){
-          if (length(val$x) < 3 | is.null(val$x) == TRUE){
-            paste("Please click to add more points.")
-          }
-          else if (length(val$x) >= 3 & round(cor(val$x, val$y),
-                                              digits = 1) == -0.2){
-            paste("The correlation is correct!",
-                  "Please guess and draw the regression line.",
-                  "Then check the “Regression line” box to see how you did.")
-          }
-          else if(length(val$x) >= 3 & round(cor(val$x, val$y),
-                                             digits = 1) != -0.2){
-            paste("Sorry,correlation is not equal to -0.2.",
-                  "Please add other points or try again for the correlation.",
-                  "You can check the “Show correlation value” box
+                }
+              }
+              else if (c$right == 8) {
+                if (length(val$x) < 3 | is.null(val$x) == TRUE) {
+                  paste("Please click to add more points.")
+                }
+                else if (length(val$x) >= 3 & round(cor(val$x, val$y),
+                                                    digits = 1) == -0.2) {
+                  paste("The correlation is correct!",
+                        "Please guess and draw the regression line.",
+                        "Then check the “Regression line” box to see how you did.")
+                }
+                else if (length(val$x) >= 3 & round(cor(val$x, val$y),
+                                                    digits = 1) != -0.2) {
+                  paste("Sorry,correlation is not equal to -0.2.",
+                        "Please add other points or try again for the correlation.",
+                        "You can check the “Show correlation value” box
                   to see the current correlation.")
-          }
-        }
-        else if(c$right == 9){
-          if (length(val$x) < 3 | is.null(val$x) == TRUE){
-            paste("Please click to add more points.")
-          }
-          else if (length(val$x) >= 3 & round(cor(val$x,val$y), digits = 1)
-                   >= -0.1 & round(cor(val$x,val$y), digits = 1) <= 0.1){
-            paste("The correlation is correct!",
-                  "Please make sure that your graph shows a strong non-linear
+                }
+              }
+              else if (c$right == 9) {
+                if (length(val$x) < 3 | is.null(val$x) == TRUE) {
+                  paste("Please click to add more points.")
+                }
+                else if (length(val$x) >= 3 & round(cor(val$x,val$y), digits = 1)
+                         >= -0.1 & round(cor(val$x,val$y), digits = 1) <= 0.1) {
+                  paste("The correlation is correct!",
+                        "Please make sure that your graph shows a strong non-linear
                   correlation.")
-          }
-          else if (length(val$x) >= 3 & (round(cor(val$x,val$y), digits = 1)
-                                         < -0.1 | round(cor(val$x,val$y), digits = 1) > 0.1)){
-            paste("Sorry, correlation is not between -0.1 and 0.1.",
-                  "Please add other points or try again for the correlation.",
-                  "Also, please make sure that your graph shows
+                }
+                else if (length(val$x) >= 3 & (round(cor(val$x,val$y), digits = 1)
+                                               < -0.1 | round(cor(val$x,val$y), 
+                                                              digits = 1) > 0.1)) {
+                  paste("Sorry, correlation is not between -0.1 and 0.1.",
+                        "Please add other points or try again for the correlation.",
+                        "Also, please make sure that your graph shows
                   a strong non-linear correlation.")
-          }
-        }
-        else if (c$right == 10){
-          if (length(val$x) < 3 | is.null(val$x) == TRUE){
-            paste("Please click to add more points.")
-          }
-          else if (length(val$x) >= 3 & round(cor(val$x,val$y), digits = 1)
-                   >= 0.4 & round(cor(val$x,val$y), digits = 1) <= 0.6){
-            paste("The correlation is correct!",
-                  "Please make sure that your graph shows a strong non-linear
+                }
+              }
+              else if (c$right == 10) {
+                if (length(val$x) < 3 | is.null(val$x) == TRUE) {
+                  paste("Please click to add more points.")
+                }
+                else if (length(val$x) >= 3 & round(cor(val$x,val$y), digits = 1)
+                         >= 0.4 & round(cor(val$x,val$y), digits = 1) <= 0.6) {
+                  paste("The correlation is correct!",
+                        "Please make sure that your graph shows a strong non-linear
                   correlation.")
-          }
-          else if (length(val$x) >= 3 & (round(cor(val$x,val$y), digits = 1)
-                                         < 0.4 | round(cor(val$x,val$y), digits = 1) > 0.6)){
-            paste("Sorry, correlation is not between 0.4 and 0.6.",
-                  "Please add other points or try again for the correlation.",
-                  "Also, please make sure that your graph shows a strong
+                }
+                else if (length(val$x) >= 3 & (round(cor(val$x,val$y), digits = 1)
+                                               < 0.4 | round(cor(val$x,val$y), 
+                                                             digits = 1) > 0.6)) {
+                  paste("Sorry, correlation is not between 0.4 and 0.6.",
+                        "Please add other points or try again for the correlation.",
+                        "Also, please make sure that your graph shows a strong
                   non-linear correlation.")
-          }
-        }
-        else if (c$right == 11){
-          if (length(val$x) < 3 | is.null(val$x) == TRUE){
-            paste("Please click to add more points.")
-          }
-          else if (length(val$x) >= 3){
-            paste("You can check the “Show correlation value” box to see
+                }
+              }
+              else if (c$right == 11) {
+                if (length(val$x) < 3 | is.null(val$x) == TRUE) {
+                  paste("Please click to add more points.")
+                }
+                else if (length(val$x) >= 3) {
+                  paste("You can check the “Show correlation value” box to see
                   the current correlation.")
+                }
+              }
+            }
+          )
+          ## show regression equation
+          if (input$regressionLine  == "TRUE" & length(val$x) >= 3 ) {
+            abline(lm(val$y ~ val$x, data = data1), lwd = "4")
+            mod_name <- lm(val$y ~ val$x, data = data1)
+            mod_name$coeff[2]
+            output$regression_equation <- renderText(
+              expr = {
+                paste(
+                  "Regression Equation : y =",
+                  round(mod_name$coeff[1], digits = 2),
+                  "+",
+                  "(",
+                  round(mod_name$coeff[2], digits = 2), 
+                  ")",
+                  "* x"
+                )
+              }
+            )
+          }
+          else if (input$regressionLine  == "TRUE" & length(val$x) < 3 ) {
+            output$regression_equation <- renderText(
+              expr = {
+                paste("Please click to add more points.")
+              }
+            )
+          }
+          # show correlation
+          if (input$correlation  == "TRUE" & length(val$x) >= 3 ) {
+            output$correlation <- renderText(
+              expr = {
+                paste(
+                  "Correlation = ",
+                  round(cor(val$x,val$y), digits = 2)
+                )
+              }
+            )
+          }
+          else if (input$correlation  == "TRUE" & length(val$x) < 3 ) {
+            output$correlation <- renderText(
+              expr = {
+                paste("Please click to add more points.")
+              }
+            )
           }
         }
-      })
-      ## show regression equation
-      if (input$regressionline  == "TRUE" & length(val$x) >= 3 ){
-        abline(lm(val$y ~ val$x, data = data1), lwd = "4")
-        mod_name <- lm(val$y ~ val$x, data = data1)
-        mod_name$coeff[2]
-        output$regression_equation <- renderText({
-          paste("Regression Equation : y =",
-                round(mod_name$coeff[1], digits = 2), "+", "(",
-                round(mod_name$coeff[2], digits = 2), ")", "* x")
-        })
-      }
-      else if (input$regressionline  == "TRUE" & length(val$x) < 3 ){
-        output$regression_equation <- renderText({
-          paste("Please click to add more points.")
-        })}
-      # show correlation
-      if (input$correlation  == "TRUE" & length(val$x) >= 3 ){
-        output$correlation <- renderText({
-          paste("Correlation = ", round(cor(val$x,val$y), digits = 2))
-        })
-      }
-      else if (input$correlation  == "TRUE" & length(val$x) < 3 ){
-        output$correlation <- renderText({
-          paste("Please click to add more points.")
-        })
-      }
-    })
-  })
+      )
+    }
+  )
 }
 
 # Boast App Call ----
