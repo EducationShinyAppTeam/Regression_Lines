@@ -15,7 +15,7 @@ ui <- list(
     skin = "yellow",
     dashboardHeader(
       titleWidth = 250,
-      title = "Effect of Outliers",
+      title = "Regression Lines",
       tags$li(class = "dropdown", actionLink("info", icon("info"))),
       tags$li(
         class = "dropdown",
@@ -163,7 +163,10 @@ ui <- list(
         tabItem(
           tabName = "challenge",
           h2("Explore the Regression Line and Correlation"),
-          uiOutput("question", class = "largerFont"),
+          uiOutput(
+            outputId = "question", 
+            class = "largerFont"
+          ),
           br(),
           fluidRow(
             column(
@@ -543,6 +546,8 @@ server <- function(input, output,session) {
       )
     }
   )
+  
+  ### Render Cluster Plot ----
   output$clusterPlot <- renderPlot(
     expr = {
       tryCatch(
@@ -567,11 +572,23 @@ server <- function(input, output,session) {
             cex = 1.5,
             cex.lab = 1.5
           )
-        }, error = function(warn){
+        }, 
+        alt = "User can create points to test their challenges",
+        error = function(warn) {
           # Otherwise just plot the points and instructions
-          plot(val$x, val$y, xlim = c(-5, 5), ylim = c(-0.2, 5), xlab = "X",
-               ylab = "Y", cex = 1.5, cex.lab = 1.5,
-               cex.axis = 1.5, pch = 16, col = boastUtils::boastPalette[1])
+          plot(
+            x = val$x, 
+            y = val$y,
+            xlim = c(-5, 5), 
+            ylim = c(-0.2, 5), 
+            xlab = "X",
+            ylab = "Y", 
+            cex = 1.5,
+            cex.lab = 1.5,
+            cex.axis = 1.5, 
+            pch = 16,
+            col = boastUtils::boastPalette[1]
+            )
           if (input$yourOwnLine > 0 ) {
             abline(
               input$intercept, 
