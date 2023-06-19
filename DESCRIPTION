@@ -1,0 +1,22 @@
+Title: Regression Lines
+ShortName: Regression Lines
+Date: 2019-01-08
+Lifecycle: experimental
+Authors@R: c(
+    person(given = "Caihui", family = "Xiao", role = c("aut", "cre")),
+    person(given = "Zhiliang", family = "Zhang", role = c("ctb")),
+    person(given = "Jiajun", family = "Gao", role = c("ctb")),
+    person(given = "Daehoon", family = "Gwak", role = c("ctb")),
+    person(given = "Sitong", family = "Liu", role = c("ctb"))
+  )
+Chapter: Data Description
+Description: This app provides an opportunity to explore how the correlation and regression line relate to the points on a scatterplot.
+LearningObjectives: c(
+    "The student will learn to understand how the correlation and regression line are related to the points displayed in a scatterplot."
+  )
+DisplayMode: Normal
+URL: https://psu-eberly.shinyapps.io/Regression_Lines
+BugReports: https://github.com/EducationShinyAppTeam/Regression_Lines/issues
+License: CC-BY-NC-SA-4.0
+Tags: Game
+Type: Shiny
