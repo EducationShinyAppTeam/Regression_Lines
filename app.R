@@ -59,7 +59,7 @@ ui <- list(
           h2("Instructions"),
           tags$ol(
             tags$li(
-              "Head to the Prerequisites page to review concepts dealing with 
+              "Head to the Prerequisites page to review concepts related to 
               correlation and regression lines."
             ),
             tags$li(
@@ -179,7 +179,12 @@ ui <- list(
         ### Challenge ----
         tabItem(
           tabName = "challenge",
-          h2("Explore the Regression Line and Correlation"),
+          h2("Regression Line and Correlation on a Scatterplot"),
+          p("Using the user inputs, plots, and responsive feedback, explore how 
+          the correlation and regression line relate to the points on a scatterplot 
+          by completing the challenges below to the best of your ability!"),
+          br(),
+          h3("Challenge"),
           uiOutput(
             outputId = "question", 
             class = "largerFont"
@@ -187,37 +192,9 @@ ui <- list(
           br(),
           fluidRow(
             column(
-              width = 1,
-              bsButton(
-                inputId = "newChallenge",
-                label = "New Challenge",
-                size = "large"
-              )
-            ),
-            column(
-              width = 1,
-              offset = 5,
-              bsButton(
-                inputId = "reset",
-                label = "Reset",
-                size = "large",
-                style = "danger"
-              )
-            )
-          ),
-          br(),
-          #wellPanel(
-            fluidRow(
-              column(
-                width = 3,
-                checkboxInput(
-                  inputId = "yourOwnLine",
-                  label = "Create your own line (Red)",
-                  value = FALSE
-                )
-              ),
-              column(
-                width = 4,
+              width = 3,
+              wellPanel(
+                
                 sliderInput(
                   inputId = "intercept",
                   label = "Choose the intercept",
@@ -225,11 +202,7 @@ ui <- list(
                   max = 10,
                   value = 5,
                   step = 0.01
-                )
-              ),
-              column(
-                width = 4,
-                offset = 1,
+                ),
                 sliderInput(
                   inputId = "slope",
                   label = "Choose the slope",
@@ -237,60 +210,67 @@ ui <- list(
                   max = 10,
                   value = 2,
                   step = 0.01
-                )
-              )
-            ),
-            fluidRow(
-              column(
-                width = 4,
+                ),
+                checkboxInput(
+                  inputId = "yourOwnLine",
+                  label = "Create your own line (Red)",
+                  value = FALSE
+                ),
                 checkboxInput(
                   inputId = "regressionLine",
                   label = "Show regression line (black)",
                   value =  FALSE
-                )
-              ),
-              column(
-                width = 4,
-                offset = 2,
+                ),
                 checkboxInput(
                   inputId = "correlation",
                   label = "Show correlation value",
                   value = FALSE
                 )
+                
               )
-            #)
-          ),
-          br(),
-          textOutput('feedback'),
-          # Add a row for the main content
-          fluidRow(
-            # Create a space for the plot output and enable click function
-            column(
-              width = 9,
-              plotOutput(
-                outputId = "clusterPlot",
-                width = "100%",
-                click = "clusterClick"
-              ),
             ),
             column(
-              width = 3,
-              br(),
-              br(),
-              conditionalPanel(
-                condition = "input.yourOwnLine !=0",
-                textOutput('yourline')
-              ),
-              br(),
-              conditionalPanel(
-                condition = "input.regressionLine !=0",
-                textOutput('regression_equation')
-              ),
-              br(),
-              conditionalPanel(
-                condition = "input.correlation !=0",
-                textOutput('correlation')
+              width = 8,
+              offset = 1,
+              # Add a row for the main content
+              fluidRow(
+                # Create a space for the plot output and enable click function
+                plotOutput(
+                  outputId = "clusterPlot",
+                  width = "100%",
+                  click = "clusterClick"
+                ),
+                textOutput('feedback'),
+                br(),
+                conditionalPanel(
+                  condition = "input.yourOwnLine !=0",
+                  textOutput('yourline')
+                ),
+                br(),
+                conditionalPanel(
+                  condition = "input.regressionLine !=0",
+                  textOutput('regression_equation')
+                ),
+                br(),
+                conditionalPanel(
+                  condition = "input.correlation !=0",
+                  textOutput('correlation')
+                )
               )
+            )
+          ),
+          br(),
+          fluidRow(
+            bsButton(
+              inputId = "newChallenge",
+              label = "New Challenge",
+              size = "large"
+            ),
+            bsButton(
+              inputId = "reset",
+              label = "Reset",
+              size = "large",
+              style = "danger"
             )
           )
         ),
@@ -355,8 +335,8 @@ server <- function(input, output,session) {
         title = "Information",
         type = "info",
         text = "This app will allow you to explore the connection between the data 
-        points, their correlation, and the regression line using an interactive 
-        scatterplot."
+        points, their correlation, and the regression line through challenges 
+        using an interactive scatterplot."
       )
     }
   )
@@ -483,55 +463,55 @@ server <- function(input, output,session) {
   output$question <- renderText(
     expr = {
       if (c$right == 1) {
-        "Challenge: Draw some points on a scatterplot that have y = 3 – 2x
+        "Draw some points on a scatterplot that have y = 3 – 2x
       as their regression and a correlation more than - 0.8.
       (Check the “Regression line” box to see how you did.)"
       }
       else if  (c$right == 2) {
-        "Challenge: Draw some points on a scatterplot that have y = 2 + 3x
+        "Draw some points on a scatterplot that have y = 2 + 3x
       as their regression and a correlation less than 0.5.
       (Check the “Regression line” box to see how you did.)"
       }
       else if  (c$right == 3) {
-        "Challenge: Draw some points on a scatterplot that have y = 2x + 1
+        "Draw some points on a scatterplot that have y = 2x + 1
       as their regression. (Check the “Show regression”
       box to see how you did.)"
       }
       else if  (c$right == 4) {
-        "Challenge: Draw your own line with the equation y = 3 – 2x
+        "Draw your own line with the equation y = 3 – 2x
       and then add some points that have that as their regression.
       (Check the “Show regression” box to see how you did.)"
       }
       else if  (c$right == 5) {
-        "Challenge: Draw your own line with the equation y = 2 + 3x
+        "Draw your own line with the equation y = 2 + 3x
       and then add some points that have that as their regression.
       (Check the “Show regression” box to see how you did.)"
       }
       else if  (c$right == 6) {
-        "Challenge: Create some points with a correlation of 0.6
+        "Create some points with a correlation of 0.6
       and then draw your own line that is your guess at the regression line.
       (Check the “Show regression” box to see how you did.)"
       }
       else if  (c$right == 7) {
-        "Challenge: Create some points with a correlation of -0.5 and
+        "Create some points with a correlation of -0.5 and
       then draw your own line that is your guess at the regression line.
       (Check the “Show regression” box to see how you did.)"
       }
       else if  (c$right == 8) {
-        "Challenge: create some points with a correlation of -0.2
+        "Create some points with a correlation of -0.2
       and then draw your own line that is your guess at the regression line.
       (Check the “Show regression” box to see how you did.)"
       }
       else if  (c$right == 9) {
-        "Challenge: Create some points that have a strong non-linear relationship,
+        "Create some points that have a strong non-linear relationship,
       but a correlation between -0.1 and 0.1."
       }
       else if  (c$right == 10) {
-        "Challenge: Create some points that have a strong non-linear relationship,
+        "Create some points that have a strong non-linear relationship,
       but a correlation between 0.4 and 0.6."
       }
       else if  (c$right == 11) {
-        "Challenge: Create some points that follow a roughly linear pattern
+        "Create some points that follow a roughly linear pattern
       and a correlation of 0.5 and then add an outlier to make
       the correlation go down to 0."
       }
@@ -554,7 +534,7 @@ server <- function(input, output,session) {
     }
   )
   
-  ### Render Cluster Plot ----
+  ## Render Cluster Plot ----
   output$clusterPlot <- renderPlot(
     expr = {
       tryCatch(
@@ -610,7 +590,7 @@ server <- function(input, output,session) {
               if (c$right == 1) { # for the first challenge
                 # if point is less than 3,
                 if (length(val$x) < 3 | is.null(val$x) == TRUE) {
-                  paste("Please click to add more points.")
+                  paste("Please click within the plot to add more points.")
                 }
                 # if the points is greater or equal than 3
                 # and correlation is greater than -0.8,
@@ -633,7 +613,7 @@ server <- function(input, output,session) {
               }
               else if (c$right == 2) {
                 if (length(val$x) < 3 | is.null(val$x) == TRUE) {
-                  paste("Please click to add more points.")
+                  paste("Please click within the plot to add more points.")
                 }
                 else if (length(val$x) >= 3 & round(cor(val$x, val$y),
                                                     digits = 2) < 0.5) {
@@ -651,7 +631,7 @@ server <- function(input, output,session) {
               }
               else if (c$right == 3) {
                 if (length(val$x) < 3 | is.null(val$x) == TRUE) {
-                  paste("Please click to add more points.")
+                  paste("Please click within the plot to add more points.")
                 }
                 else if (length(val$x) >= 3) {
                   paste("Please check the “Show regression” box to see
@@ -684,7 +664,7 @@ server <- function(input, output,session) {
               }
               else if (c$right == 6) {
                 if (length(val$x) < 3 | is.null(val$x) == TRUE) {
-                  paste("Please click to add more points.")
+                  paste("Please click within the plot to add more points.")
                 }
                 else if (length(val$x) >= 3 & round(cor(val$x, val$y),
                                                     digits = 1) == 0.6) {
@@ -702,7 +682,7 @@ server <- function(input, output,session) {
               }
               else if (c$right == 7) {
                 if (length(val$x) < 3 | is.null(val$x) == TRUE) {
-                  paste("Please click to add more points.")
+                  paste("Please click within the plot to add more points.")
                 }
                 else if (length(val$x) >= 3 & round(cor(val$x, val$y),
                                                     digits = 1) == -0.5) {
@@ -720,7 +700,7 @@ server <- function(input, output,session) {
               }
               else if (c$right == 8) {
                 if (length(val$x) < 3 | is.null(val$x) == TRUE) {
-                  paste("Please click to add more points.")
+                  paste("Please click within the plot to add more points.")
                 }
                 else if (length(val$x) >= 3 & round(cor(val$x, val$y),
                                                     digits = 1) == -0.2) {
@@ -738,7 +718,7 @@ server <- function(input, output,session) {
               }
               else if (c$right == 9) {
                 if (length(val$x) < 3 | is.null(val$x) == TRUE) {
-                  paste("Please click to add more points.")
+                  paste("Please click within the plot to add more points.")
                 }
                 else if (length(val$x) >= 3 & round(cor(val$x,val$y), digits = 1)
                          >= -0.1 & round(cor(val$x,val$y), digits = 1) <= 0.1) {
@@ -757,7 +737,7 @@ server <- function(input, output,session) {
               }
               else if (c$right == 10) {
                 if (length(val$x) < 3 | is.null(val$x) == TRUE) {
-                  paste("Please click to add more points.")
+                  paste("Please click within the plot to add more points.")
                 }
                 else if (length(val$x) >= 3 & round(cor(val$x,val$y), digits = 1)
                          >= 0.4 & round(cor(val$x,val$y), digits = 1) <= 0.6) {
@@ -776,7 +756,7 @@ server <- function(input, output,session) {
               }
               else if (c$right == 11) {
                 if (length(val$x) < 3 | is.null(val$x) == TRUE) {
-                  paste("Please click to add more points.")
+                  paste("Please click within the plot to add more points.")
                 }
                 else if (length(val$x) >= 3) {
                   paste("You can check the “Show correlation value” box to see
@@ -807,7 +787,7 @@ server <- function(input, output,session) {
           else if (input$regressionLine  == "TRUE" & length(val$x) < 3 ) {
             output$regression_equation <- renderText(
               expr = {
-                paste("Please click to add more points.")
+                paste("More points are required to display the regression equation")
               }
             )
           }
@@ -825,7 +805,7 @@ server <- function(input, output,session) {
           else if (input$correlation  == "TRUE" & length(val$x) < 3 ) {
             output$correlation <- renderText(
               expr = {
-                paste("Please click to add more points.")
+                paste("More points are needed to display the value of the correlation")
               }
             )
           }
