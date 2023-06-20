@@ -59,6 +59,14 @@ ui <- list(
           h2("Instructions"),
           tags$ol(
             tags$li(
+              "Head to the Prerequisites page to review concepts dealing with 
+              correlation and regression lines."
+            ),
+            tags$li(
+              "When ready, make your way to Challenge page to further explore 
+              these concepts."
+            ),
+            tags$li(
               "Create your own line by entering the values for both slope
              and intercept."
             ),
@@ -67,6 +75,15 @@ ui <- list(
               "Show the regression line to compute and display
              the regression line."
             ),
+            tags$li(
+              "Try your best to complete each challenge with the assistance of 
+              the feedback above the plot."
+            ),
+            tags$li(
+              "Click 'New Challenge'
+            to recieve a new challenge to attempt."
+            ),
+    
             tags$li("Click 'RESET' to clear both points and regression lines.")
           ),
           br(),
@@ -135,7 +152,7 @@ ui <- list(
              the variable X has a specific value x: \\[\\widehat{Y}=a+b*x\\]"),
             p("In this case, 'a' is an intercept (what you predict for Y
              when x = 0) and 'b' is the slope (how much the average value of Y
-             goes up for each unit of x). The slope 'b' will always has
+             goes up for each unit of x). The slope 'b' will always have
              the same sign as the correlation."),
             p("The regression line is the straight line that makes the standard
              deviation of the vertical distances of the data points from
@@ -189,57 +206,59 @@ ui <- list(
             )
           ),
           br(),
-          fluidRow(
-            column(
-              width = 3,
-              checkboxInput(
-                inputId = "yourOwnLine",
-                label = "Create your own line (Red)",
-                value = FALSE
+          #wellPanel(
+            fluidRow(
+              column(
+                width = 3,
+                checkboxInput(
+                  inputId = "yourOwnLine",
+                  label = "Create your own line (Red)",
+                  value = FALSE
+                )
+              ),
+              column(
+                width = 4,
+                sliderInput(
+                  inputId = "intercept",
+                  label = "Choose the intercept",
+                  min = -10,
+                  max = 10,
+                  value = 5,
+                  step = 0.01
+                )
+              ),
+              column(
+                width = 4,
+                offset = 1,
+                sliderInput(
+                  inputId = "slope",
+                  label = "Choose the slope",
+                  min = -10,
+                  max = 10,
+                  value = 2,
+                  step = 0.01
+                )
               )
             ),
-            column(
-              width = 4,
-              sliderInput(
-                inputId = "intercept",
-                label = "Choose the intercept",
-                min = -10,
-                max = 10,
-                value = 5,
-                step = 0.01
+            fluidRow(
+              column(
+                width = 4,
+                checkboxInput(
+                  inputId = "regressionLine",
+                  label = "Show regression line (black)",
+                  value =  FALSE
+                )
+              ),
+              column(
+                width = 4,
+                offset = 2,
+                checkboxInput(
+                  inputId = "correlation",
+                  label = "Show correlation value",
+                  value = FALSE
+                )
               )
-            ),
-            column(
-              width = 4,
-              offset = 1,
-              sliderInput(
-                inputId = "slope",
-                label = "Choose the slope",
-                min = -10,
-                max = 10,
-                value = 2,
-                step = 0.01
-              )
-            )
-          ),
-          fluidRow(
-            column(
-              width = 4,
-              checkboxInput(
-                inputId = "regressionLine",
-                label = "Show regression line (black)",
-                value =  FALSE
-              )
-            ),
-            column(
-              width = 4,
-              offset = 2,
-              checkboxInput(
-                inputId = "correlation",
-                label = "Show correlation value",
-                value = FALSE
-              )
-            )
+            #)
           ),
           br(),
           textOutput('feedback'),
@@ -253,14 +272,6 @@ ui <- list(
                 width = "100%",
                 click = "clusterClick"
               ),
-              # Alt text
-              tags$script(
-                HTML(
-                  "$(document).ready(function(){
-                  document.getElementById('clusterPlot').setAttribute('aria-label',
-                  `User can create points to test their challenges`)})"
-                )
-              )
             ),
             column(
               width = 3,
@@ -341,15 +352,11 @@ server <- function(input, output,session) {
     handlerExpr = {
       sendSweetAlert(
         session = session,
-        title = "Instructions",
+        title = "Information",
         type = "info",
-        tags$ol(
-          tags$li('Click New Challenge to change a challenge.'),
-          tags$li('Create your own line by entering the values for
-                both slope and intercept.'),
-          tags$li('Create points by clicking in the plot.'),
-          tags$li('Click RESET to clear both points and regression lines.')
-        )
+        text = "This app will allow you to explore the connection between the data 
+        points, their correlation, and the regression line using an interactive 
+        scatterplot."
       )
     }
   )
@@ -615,7 +622,8 @@ server <- function(input, output,session) {
                 }
                 # if the points is greater or equal than 3
                 # and correlation is less than -0.8,
-                else if (length(val$x) >= 3 & round(cor(val$x, val$y),
+                else if (
+                  length(val$x) >= 3 & round(cor(val$x, val$y),
                                                     digits = 2) <= -0.8) {
                   paste("Sorry, correlation <= -0.8.",
                         "Please add other points or try again for the correlation.",
