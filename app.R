@@ -235,12 +235,12 @@ ui <- list(
               # Add a row for the main content
               fluidRow(
                 # Create a space for the plot output and enable click function
+                textOutput('feedback'),
                 plotOutput(
                   outputId = "clusterPlot",
                   width = "100%",
                   click = "clusterClick"
                 ),
-                textOutput('feedback'),
                 br(),
                 conditionalPanel(
                   condition = "input.yourOwnLine !=0",
@@ -264,6 +264,11 @@ ui <- list(
             bsButton(
               inputId = "newChallenge",
               label = "New Challenge",
+              size = "large"
+            ),
+            bsButton(
+              inputId = "undoButton",
+              label = "Undo Point",
               size = "large"
             ),
             bsButton(
@@ -517,14 +522,14 @@ server <- function(input, output,session) {
       }
     }
   )
-  
+
   # Listen for clicks
   observe(
     x = {
       # Initially will be empty
       if (is.null(input$clusterClick)) {
         return()
-      }
+      } 
       isolate(
         expr = {
           val$x <- c(val$x, input$clusterClick$x)
@@ -811,6 +816,16 @@ server <- function(input, output,session) {
           }
         }
       )
+    }
+  )
+  
+  ## Undo Last Point Button ----
+  observeEvent(
+    eventExpr = input$undoButton, 
+    handlerExpr = {
+      # Remove the last row from the dataframe
+      val$x <- val$x[-length(val$x)]
+      val$y <- val$y[-length(val$y)]
     }
   )
 }

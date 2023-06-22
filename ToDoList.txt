@@ -9,9 +9,9 @@
 7. Update description aut and ctrb ✓
 8. Update Information Button. ✓
 9. Update alt arguments ✓
-10. Reorganize the Challenge Page
+10. Reorganize the Challenge Page 
 
 # Ideas for Future Development
 
 1. Possibly add an Undo button that undoes the last point clicked on in the plot
-  Should delete the last row of coordinates.
+  Should delete the last row of coordinates. ✓ (Added a functioning undo button)
