@@ -103,8 +103,8 @@ ui <- list(
           p(
             "This app was developed and coded by Caihui Xiao.
             The app was further updated by Zhiliang Zhang and Jiajun Gao
-            in June 2018 and by Daehoon Gwak in July 2020.
-            Special thanks to Sitong Liu for help on some programming issues.",
+            in June 2018, Daehoon Gwak in July 2020, and by Sean Burke in June 
+            2023. Special thanks to Sitong Liu for help on some programming issues.",
             br(),
             br(),
             br(),

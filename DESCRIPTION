@@ -7,7 +7,8 @@ Authors@R: c(
     person(given = "Zhiliang", family = "Zhang", role = c("ctb")),
     person(given = "Jiajun", family = "Gao", role = c("ctb")),
     person(given = "Daehoon", family = "Gwak", role = c("ctb")),
-    person(given = "Sitong", family = "Liu", role = c("ctb"))
+    person(given = "Sitong", family = "Liu", role = c("ctb")),
+    person(given = "Sean", family = "Burke", role = c("ctb"))
   )
 Chapter: Data Description
 Description: This app provides an opportunity to explore how the correlation and regression line relate to the points on a scatterplot.
