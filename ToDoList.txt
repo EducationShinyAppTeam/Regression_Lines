@@ -9,7 +9,8 @@
 7. Update description aut and ctrb ✓
 8. Update Information Button. ✓
 9. Update alt arguments ✓
-10. Reorganize the Challenge Page 
+10. Reorganize the Challenge Page
+11. Convert to ggplot.
 
 # Ideas for Future Development
 

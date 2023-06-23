@@ -225,13 +225,30 @@ ui <- list(
                   inputId = "correlation",
                   label = "Show correlation value",
                   value = FALSE
+                ),
+                fluidRow(
+                  bsButton(
+                    inputId = "newChallenge",
+                    label = "New Challenge",
+                    size = "large"
+                  ),
+                  bsButton(
+                    inputId = "undoButton",
+                    label = "Undo Point",
+                    size = "large"
+                  ),
+                  bsButton(
+                    inputId = "reset",
+                    label = "Reset",
+                    size = "large",
+                    style = "danger"
+                  )
                 )
-                
               )
             ),
             column(
-              width = 8,
-              offset = 1,
+              width = 9,
+              offset = 0,
               # Add a row for the main content
               fluidRow(
                 # Create a space for the plot output and enable click function
@@ -257,25 +274,6 @@ ui <- list(
                   textOutput('correlation')
                 )
               )
-            )
-          ),
-          br(),
-          fluidRow(
-            bsButton(
-              inputId = "newChallenge",
-              label = "New Challenge",
-              size = "large"
-            ),
-            bsButton(
-              inputId = "undoButton",
-              label = "Undo Point",
-              size = "large"
-            ),
-            bsButton(
-              inputId = "reset",
-              label = "Reset",
-              size = "large",
-              style = "danger"
             )
           )
         ),
