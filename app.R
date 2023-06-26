@@ -194,7 +194,6 @@ ui <- list(
             column(
               width = 3,
               wellPanel(
-                
                 sliderInput(
                   inputId = "intercept",
                   label = "Choose the intercept",
@@ -248,7 +247,6 @@ ui <- list(
             ),
             column(
               width = 9,
-              offset = 0,
               # Add a row for the main content
               fluidRow(
                 # Create a space for the plot output and enable click function
@@ -540,282 +538,263 @@ server <- function(input, output,session) {
   ## Render Cluster Plot ----
   output$clusterPlot <- renderPlot(
     expr = {
-      tryCatch(
-        expr = {
-          # Format the data as a matrix
-          data1 <- data.frame(c(val$x, val$y), ncol = 2)
-          # Try to cluster
-          if (length(val$x) <= 1) {
-            stop("We can't cluster less than 2 points")
-          }
-          suppressWarnings(
-            expr = {
-              fit <- Mclust(data)
-            }
-          )
-          mclust2Dplot(
-            data = data1, 
-            what = "classification",
-            classification = fit$classification, 
-            main = FALSE,
-            xlim = c(-2,2), ylim = c(-0.2,5),
-            cex = 1.5,
-            cex.lab = 1.5
-          )
-        }, 
-        alt = "User can create points to test their challenges",
-        error = function(warn) {
-          # Otherwise just plot the points and instructions
-          plot(
-            x = val$x, 
-            y = val$y,
-            xlim = c(-5, 5), 
-            ylim = c(-0.2, 5), 
-            xlab = "X",
-            ylab = "Y", 
-            cex = 1.5,
-            cex.lab = 1.5,
-            cex.axis = 1.5, 
-            pch = 16,
-            col = boastUtils::boastPalette[1]
-            )
-          if (input$yourOwnLine > 0 ) {
-            abline(
-              input$intercept, 
-              input$slope, 
-              col = boastUtils::psuPalette[2], 
-              lwd = "3.8"
-            )
-          }
-          # Feedback for each challenge
-          output$feedback <- renderText(
-            expr = {
-              if (c$right == 1) { # for the first challenge
-                # if point is less than 3,
-                if (length(val$x) < 3 | is.null(val$x) == TRUE) {
-                  paste("Please click within the plot to add more points.")
-                }
-                # if the points is greater or equal than 3
-                # and correlation is greater than -0.8,
-                else if (length(val$x) >= 3 & round(cor(val$x,val$y),
-                                                    digits = 2) > -0.8) {
-                  paste("The correlation is correct!
-                  Please check the “Regression line” box to see
-                  how you did for regression.")
-                }
-                # if the points is greater or equal than 3
-                # and correlation is less than -0.8,
-                else if (
-                  length(val$x) >= 3 & round(cor(val$x, val$y),
-                                                    digits = 2) <= -0.8) {
-                  paste("Sorry, correlation <= -0.8.",
-                        "Please add other points or try again for the correlation.",
-                        "Please check the “Regression line” box to see
-                  how you did for regression")
-                }
-              }
-              else if (c$right == 2) {
-                if (length(val$x) < 3 | is.null(val$x) == TRUE) {
-                  paste("Please click within the plot to add more points.")
-                }
-                else if (length(val$x) >= 3 & round(cor(val$x, val$y),
-                                                    digits = 2) < 0.5) {
-                  paste("The correlation is correct!",
-                        "Please check the “Regression line” box to see
-                  how you did for regression")
-                }
-                else if (length(val$x) >= 3 & round(cor(val$x,val$y),
-                                                    digits = 2) >= 0.5) {
-                  paste("Sorry, correlation >= 0.5.",
-                        "Please add other points or try again for the correlation.",
-                        "Please check the “Regression line” box to see
-                  how you did for regression")
-                }
-              }
-              else if (c$right == 3) {
-                if (length(val$x) < 3 | is.null(val$x) == TRUE) {
-                  paste("Please click within the plot to add more points.")
-                }
-                else if (length(val$x) >= 3) {
-                  paste("Please check the “Show regression” box to see
-                  how you did for regression")
-                }
-              }
-              else if (c$right == 4) {
-                if (is.null(val$x) == TRUE) {
-                  paste("Please draw the line first.")
-                }
-                else if (length(val$x) < 3) {
-                  paste("Please add more points ")
-                }
-                else if (length(val$x >= 3)) {
-                  paste("Please check the “Show regression” box to see
-                  how well do the lines match")
-                }
-              }
-              else if (c$right == 5) {
-                if (is.null(val$x) == TRUE) {
-                  paste("Please draw the line first.")
-                }
-                else if (length(val$x) < 3) {
-                  paste("Please add more points ")
-                }
-                else if (length(val$x >= 3)) {
-                  paste("Please check the “Show regression” box to see
-                  how well do the lines match")
-                }
-              }
-              else if (c$right == 6) {
-                if (length(val$x) < 3 | is.null(val$x) == TRUE) {
-                  paste("Please click within the plot to add more points.")
-                }
-                else if (length(val$x) >= 3 & round(cor(val$x, val$y),
-                                                    digits = 1) == 0.6) {
-                  paste("The correlation is correct!",
-                        "Please guess and draw the regression line.",
-                        "Then check the “Regression line” box to see how you did.")
-                }
-                else if (length(val$x) >= 3 & round( cor(val$x, val$y),
-                                                     digits = 1) != 0.6) {
-                  paste("Sorry, correlation is not equal to 0.6.",
-                        "Please add other points or try again for the correlation.",
-                        "You can check the “Show correlation value” box
-                  to see the current correlation.")
-                }
-              }
-              else if (c$right == 7) {
-                if (length(val$x) < 3 | is.null(val$x) == TRUE) {
-                  paste("Please click within the plot to add more points.")
-                }
-                else if (length(val$x) >= 3 & round(cor(val$x, val$y),
-                                                    digits = 1) == -0.5) {
-                  paste("The correlation is correct!",
-                        "Please guess and draw the regression line.",
-                        "Then check the “Regression line” box to see how you did.")
-                }
-                else if (length(val$x) >= 3 & round(cor(val$x, val$y),
-                                                    digits = 1) != -0.5) {
-                  paste("Sorry, correlation is not equal to -0.5.",
-                        "Please add other points or try again for the correlation.",
-                        "You can check the “Show correlation value” box
-                  to see the current correlation.")
-                }
-              }
-              else if (c$right == 8) {
-                if (length(val$x) < 3 | is.null(val$x) == TRUE) {
-                  paste("Please click within the plot to add more points.")
-                }
-                else if (length(val$x) >= 3 & round(cor(val$x, val$y),
-                                                    digits = 1) == -0.2) {
-                  paste("The correlation is correct!",
-                        "Please guess and draw the regression line.",
-                        "Then check the “Regression line” box to see how you did.")
-                }
-                else if (length(val$x) >= 3 & round(cor(val$x, val$y),
-                                                    digits = 1) != -0.2) {
-                  paste("Sorry,correlation is not equal to -0.2.",
-                        "Please add other points or try again for the correlation.",
-                        "You can check the “Show correlation value” box
-                  to see the current correlation.")
-                }
-              }
-              else if (c$right == 9) {
-                if (length(val$x) < 3 | is.null(val$x) == TRUE) {
-                  paste("Please click within the plot to add more points.")
-                }
-                else if (length(val$x) >= 3 & round(cor(val$x,val$y), digits = 1)
-                         >= -0.1 & round(cor(val$x,val$y), digits = 1) <= 0.1) {
-                  paste("The correlation is correct!",
-                        "Please make sure that your graph shows a strong non-linear
-                  correlation.")
-                }
-                else if (length(val$x) >= 3 & (round(cor(val$x,val$y), digits = 1)
-                                               < -0.1 | round(cor(val$x,val$y), 
-                                                              digits = 1) > 0.1)) {
-                  paste("Sorry, correlation is not between -0.1 and 0.1.",
-                        "Please add other points or try again for the correlation.",
-                        "Also, please make sure that your graph shows
-                  a strong non-linear correlation.")
-                }
-              }
-              else if (c$right == 10) {
-                if (length(val$x) < 3 | is.null(val$x) == TRUE) {
-                  paste("Please click within the plot to add more points.")
-                }
-                else if (length(val$x) >= 3 & round(cor(val$x,val$y), digits = 1)
-                         >= 0.4 & round(cor(val$x,val$y), digits = 1) <= 0.6) {
-                  paste("The correlation is correct!",
-                        "Please make sure that your graph shows a strong non-linear
-                  correlation.")
-                }
-                else if (length(val$x) >= 3 & (round(cor(val$x,val$y), digits = 1)
-                                               < 0.4 | round(cor(val$x,val$y), 
-                                                             digits = 1) > 0.6)) {
-                  paste("Sorry, correlation is not between 0.4 and 0.6.",
-                        "Please add other points or try again for the correlation.",
-                        "Also, please make sure that your graph shows a strong
-                  non-linear correlation.")
-                }
-              }
-              else if (c$right == 11) {
-                if (length(val$x) < 3 | is.null(val$x) == TRUE) {
-                  paste("Please click within the plot to add more points.")
-                }
-                else if (length(val$x) >= 3) {
-                  paste("You can check the “Show correlation value” box to see
-                  the current correlation.")
-                }
-              }
-            }
-          )
-          ## show regression equation
-          if (input$regressionLine  == "TRUE" & length(val$x) >= 3 ) {
-            abline(lm(val$y ~ val$x, data = data1), lwd = "4")
-            mod_name <- lm(val$y ~ val$x, data = data1)
-            mod_name$coeff[2]
-            output$regression_equation <- renderText(
-              expr = {
-                paste(
-                  "Regression Equation : y =",
-                  round(mod_name$coeff[1], digits = 2),
-                  "+",
-                  "(",
-                  round(mod_name$coeff[2], digits = 2), 
-                  ")",
-                  "* x"
-                )
-              }
+      if (length(val$x) < 1) {
+        data1 <- data.frame(x = numeric(), y = numeric())
+      } else {
+        data1 <- data.frame(x = val$x, y = val$y)
+      }
+      
+      clusPlot <- ggplot(
+        data = data1, 
+        mapping = aes(x = x, y = y)
+      ) +
+        geom_point(
+          size = 3, 
+          col = boastUtils::boastPalette[1]
+        ) +
+        scale_x_continuous(
+          breaks = seq(-5, 5, 2),
+          limits = c(-5,5)
+        ) +
+        scale_y_continuous(
+          breaks = seq(-5, 5, 2),
+          limits = c(-5,5)
+        ) +
+        labs(x = "X", y = "Y") +
+        theme_bw() +
+        coord_fixed() 
+      
+      if (input$yourOwnLine > 0) {
+        clusPlot <- clusPlot + geom_abline(
+          intercept = input$intercept,
+          slope = input$slope,
+          col =  boastUtils::psuPalette[2],
+          lwd = 0.75
+        )
+      }
+      
+      if (input$regressionLine == "TRUE" & length(val$x) >= 3) {
+        model <- lm(y ~ x, data = data1)
+        clusPlot <- clusPlot + geom_abline(
+          intercept = coef(model)[1],
+          slope = coef(model)[2],
+          col =  boastUtils::boastPalette[5],
+          lwd = 1
+        )
+        output$regression_equation <- renderText(
+          expr = {
+            paste(
+              "Regression Equation: y =", 
+              round(coef(model)[1], digits = 2),
+              "+ (", 
+              round(coef(model)[2], digits = 2),
+              ") * x"
             )
           }
-          else if (input$regressionLine  == "TRUE" & length(val$x) < 3 ) {
-            output$regression_equation <- renderText(
-              expr = {
-                paste("More points are required to display the regression equation")
-              }
-            )
+        )
+      } else if (input$regressionLine == "TRUE" & length(val$x) < 3) {
+        output$regression_equation <- renderText(
+          "More points are required to display the regression equation"
+        )
+      }
+      
+      if (input$correlation == "TRUE" & length(val$x) >= 3) {
+        output$correlation <- renderText(
+          expr = {
+            paste("Correlation =", round(cor(data1$x, data1$y), digits = 2))
           }
-          # show correlation
-          if (input$correlation  == "TRUE" & length(val$x) >= 3 ) {
-            output$correlation <- renderText(
-              expr = {
-                paste(
-                  "Correlation = ",
-                  round(cor(val$x,val$y), digits = 2)
-                )
-              }
-            )
-          }
-          else if (input$correlation  == "TRUE" & length(val$x) < 3 ) {
-            output$correlation <- renderText(
-              expr = {
-                paste("More points are needed to display the value of the correlation")
-              }
-            )
-          }
-        }
-      )
+        )
+      } else if (input$correlation == "TRUE" & length(val$x) < 3) {
+        output$correlation <- renderText(
+          "More points are needed to display the value of the correlation"
+        )
+      }
+      clusPlot 
     }
   )
+  
+  # Feedback for each challenge
+  output$feedback <- renderText(
+    expr = {
+      if (c$right == 1) { # for the first challenge
+        # if point is less than 3,
+        if (length(val$x) < 3 | is.null(val$x) == TRUE) {
+          paste("Please click within the plot to add more points.")
+        }
+        # if the points is greater or equal than 3
+        # and correlation is greater than -0.8,
+        else if (length(val$x) >= 3 & round(cor(val$x,val$y),
+                                            digits = 2) > -0.8) {
+          paste("The correlation is correct!
+                  Please check the “Regression line” box to see
+                  how you did for regression.")
+        }
+        # if the points is greater or equal than 3
+        # and correlation is less than -0.8,
+        else if (
+          length(val$x) >= 3 & round(cor(val$x, val$y),
+                                     digits = 2) <= -0.8) {
+          paste("Sorry, correlation <= -0.8.",
+                "Please add other points or try again for the correlation.",
+                "Please check the “Regression line” box to see
+                  how you did for regression")
+        }
+      }
+      else if (c$right == 2) {
+        if (length(val$x) < 3 | is.null(val$x) == TRUE) {
+          paste("Please click within the plot to add more points.")
+        }
+        else if (length(val$x) >= 3 & round(cor(val$x, val$y),
+                                            digits = 2) < 0.5) {
+          paste("The correlation is correct!",
+                "Please check the “Regression line” box to see
+                  how you did for regression")
+        }
+        else if (length(val$x) >= 3 & round(cor(val$x,val$y),
+                                            digits = 2) >= 0.5) {
+          paste("Sorry, correlation >= 0.5.",
+                "Please add other points or try again for the correlation.",
+                "Please check the “Regression line” box to see
+                  how you did for regression")
+        }
+      }
+      else if (c$right == 3) {
+        if (length(val$x) < 3 | is.null(val$x) == TRUE) {
+          paste("Please click within the plot to add more points.")
+        }
+        else if (length(val$x) >= 3) {
+          paste("Please check the “Show regression” box to see
+                  how you did for regression")
+        }
+      }
+      else if (c$right == 4) {
+        if (is.null(val$x) == TRUE) {
+          paste("Please draw the line first.")
+        }
+        else if (length(val$x) < 3) {
+          paste("Please add more points ")
+        }
+        else if (length(val$x >= 3)) {
+          paste("Please check the “Show regression” box to see
+                  how well do the lines match")
+        }
+      }
+      else if (c$right == 5) {
+        if (is.null(val$x) == TRUE) {
+          paste("Please draw the line first.")
+        }
+        else if (length(val$x) < 3) {
+          paste("Please add more points ")
+        }
+        else if (length(val$x >= 3)) {
+          paste("Please check the “Show regression” box to see
+                  how well do the lines match")
+        }
+      }
+      else if (c$right == 6) {
+        if (length(val$x) < 3 | is.null(val$x) == TRUE) {
+          paste("Please click within the plot to add more points.")
+        }
+        else if (length(val$x) >= 3 & round(cor(val$x, val$y),
+                                            digits = 1) == 0.6) {
+          paste("The correlation is correct!",
+                "Please guess and draw the regression line.",
+                "Then check the “Regression line” box to see how you did.")
+        }
+        else if (length(val$x) >= 3 & round( cor(val$x, val$y),
+                                             digits = 1) != 0.6) {
+          paste("Sorry, correlation is not equal to 0.6.",
+                "Please add other points or try again for the correlation.",
+                "You can check the “Show correlation value” box
+                  to see the current correlation.")
+        }
+      }
+      else if (c$right == 7) {
+        if (length(val$x) < 3 | is.null(val$x) == TRUE) {
+          paste("Please click within the plot to add more points.")
+        }
+        else if (length(val$x) >= 3 & round(cor(val$x, val$y),
+                                            digits = 1) == -0.5) {
+          paste("The correlation is correct!",
+                "Please guess and draw the regression line.",
+                "Then check the “Regression line” box to see how you did.")
+        }
+        else if (length(val$x) >= 3 & round(cor(val$x, val$y),
+                                            digits = 1) != -0.5) {
+          paste("Sorry, correlation is not equal to -0.5.",
+                "Please add other points or try again for the correlation.",
+                "You can check the “Show correlation value” box
+                  to see the current correlation.")
+        }
+      }
+      else if (c$right == 8) {
+        if (length(val$x) < 3 | is.null(val$x) == TRUE) {
+          paste("Please click within the plot to add more points.")
+        }
+        else if (length(val$x) >= 3 & round(cor(val$x, val$y),
+                                            digits = 1) == -0.2) {
+          paste("The correlation is correct!",
+                "Please guess and draw the regression line.",
+                "Then check the “Regression line” box to see how you did.")
+        }
+        else if (length(val$x) >= 3 & round(cor(val$x, val$y),
+                                            digits = 1) != -0.2) {
+          paste("Sorry,correlation is not equal to -0.2.",
+                "Please add other points or try again for the correlation.",
+                "You can check the “Show correlation value” box
+                  to see the current correlation.")
+        }
+      }
+      else if (c$right == 9) {
+        if (length(val$x) < 3 | is.null(val$x) == TRUE) {
+          paste("Please click within the plot to add more points.")
+        }
+        else if (length(val$x) >= 3 & round(cor(val$x,val$y), digits = 1)
+                 >= -0.1 & round(cor(val$x,val$y), digits = 1) <= 0.1) {
+          paste("The correlation is correct!",
+                "Please make sure that your graph shows a strong non-linear
+                  correlation.")
+        }
+        else if (length(val$x) >= 3 & (round(cor(val$x,val$y), digits = 1)
+                                       < -0.1 | round(cor(val$x,val$y), 
+                                                      digits = 1) > 0.1)) {
+          paste("Sorry, correlation is not between -0.1 and 0.1.",
+                "Please add other points or try again for the correlation.",
+                "Also, please make sure that your graph shows
+                  a strong non-linear correlation.")
+        }
+      }
+      else if (c$right == 10) {
+        if (length(val$x) < 3 | is.null(val$x) == TRUE) {
+          paste("Please click within the plot to add more points.")
+        }
+        else if (length(val$x) >= 3 & round(cor(val$x,val$y), digits = 1)
+                 >= 0.4 & round(cor(val$x,val$y), digits = 1) <= 0.6) {
+          paste("The correlation is correct!",
+                "Please make sure that your graph shows a strong non-linear
+                  correlation.")
+        }
+        else if (length(val$x) >= 3 & (round(cor(val$x,val$y), digits = 1)
+                                       < 0.4 | round(cor(val$x,val$y), 
+                                                     digits = 1) > 0.6)) {
+          paste("Sorry, correlation is not between 0.4 and 0.6.",
+                "Please add other points or try again for the correlation.",
+                "Also, please make sure that your graph shows a strong
+                  non-linear correlation.")
+        }
+      }
+      else if (c$right == 11) {
+        if (length(val$x) < 3 | is.null(val$x) == TRUE) {
+          paste("Please click within the plot to add more points.")
+        }
+        else if (length(val$x) >= 3) {
+          paste("You can check the “Show correlation value” box to see
+                  the current correlation.")
+        }
+      }
+    }
+  )
+  
   
   ## Undo Last Point Button ----
   observeEvent(
