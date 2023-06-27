@@ -246,14 +246,13 @@ ui <- list(
               )
             ),
             column(
-              width = 9,
+              width = 8,
               # Add a row for the main content
               fluidRow(
                 # Create a space for the plot output and enable click function
                 textOutput('feedback'),
                 plotOutput(
                   outputId = "clusterPlot",
-                  width = "100%",
                   click = "clusterClick"
                 ),
                 br(),
@@ -549,7 +548,7 @@ server <- function(input, output,session) {
         mapping = aes(x = x, y = y)
       ) +
         geom_point(
-          size = 3, 
+          size = 4.5, 
           col = boastUtils::boastPalette[1]
         ) +
         scale_x_continuous(
@@ -562,14 +561,14 @@ server <- function(input, output,session) {
         ) +
         labs(x = "X", y = "Y") +
         theme_bw() +
-        coord_fixed() 
+        coord_cartesian(xlim = c(-5, 5), ylim = c(-5, 5), expand = FALSE)
       
       if (input$yourOwnLine > 0) {
         clusPlot <- clusPlot + geom_abline(
           intercept = input$intercept,
           slope = input$slope,
           col =  boastUtils::psuPalette[2],
-          lwd = 0.75
+          lwd = 1.25
         )
       }
       
@@ -579,7 +578,7 @@ server <- function(input, output,session) {
           intercept = coef(model)[1],
           slope = coef(model)[2],
           col =  boastUtils::boastPalette[5],
-          lwd = 1
+          lwd = 1.5
         )
         output$regression_equation <- renderText(
           expr = {
