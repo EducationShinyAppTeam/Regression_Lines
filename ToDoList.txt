@@ -9,9 +9,9 @@
 7. Update description aut and ctrb ✓
 8. Update Information Button. ✓
 9. Update alt arguments ✓
-10. Reorganize the Challenge Page
-11. Convert to ggplot.
-12. Properly align the plot.
+10. Reorganize the Challenge Page ✓
+11. Convert to ggplot.✓
+
 # Ideas for Future Development
 
 1. Possibly add an Undo button that undoes the last point clicked on in the plot
