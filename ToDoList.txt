@@ -1,6 +1,6 @@
 # Things Needed for This Version
 
-1. Add screenshot 
+1. Add screenshot ✓
 2. Add/Fix description/README/CODEOWNERS/.lintr files ✓
 3. Add docs folder. ✓
 4. Add Cite this app as entry. ✓
@@ -11,6 +11,8 @@
 9. Update alt arguments ✓
 10. Reorganize the Challenge Page ✓
 11. Convert to ggplot.✓
+12. Add adaptive alt text to plot ✓
+13. Update references ✓
 
 # Ideas for Future Development
 

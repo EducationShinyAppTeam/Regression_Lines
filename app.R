@@ -6,6 +6,7 @@ library(shinyWidgets)
 library(boastUtils)
 library(ggplot2)
 
+
 # Define global constants and functions ----
 
 # Define the UI ----
@@ -78,6 +79,10 @@ ui <- list(
             tags$li(
               "Try your best to complete each challenge with the assistance of 
               the feedback above the plot."
+            ),
+            tags$li(
+              "Click 'Undo Point' if you would like to undo the last point placed 
+              on the plot."
             ),
             tags$li(
               "Click 'New Challenge'
@@ -313,6 +318,14 @@ ui <- list(
             "Statistical Applets - Correlation and Regression (n.d.),
           Available from
           http://digitalfirst.bfwpub.com/stats_applet/generic_stats_applet_5_correg.html"
+          ),
+          p(     # ggplot2
+            class = "hangingindent",
+            "Wickham, H., Chang, W., Henry, L., Pedersen, T.L., Takahashi, K.,
+            Wilke, C, Woo, K., Yutani, H., and Dunnington, D. (2020),
+            ggplot2: Create Elegant Data Visualisations Using the
+            Grammar of Graphics, R Package. Available from
+            https://cran.r-project.org/web/packages/ggplot2/index.html"
           ),
           br(),
           br(),
@@ -609,7 +622,29 @@ server <- function(input, output,session) {
         )
       }
       clusPlot 
-    }
+    },
+    alt = reactive(
+      paste0(
+        "This clusterplot contains ",
+        length(val$x),
+        " point(s) and",
+        if (length(val$x) >= 3) {
+          if (round(cor(val$x,val$y) > 0)) {
+            " has a positive trend."
+          } else if (round(cor(val$x,val$y) < 0)) {
+            " has a negative trend."
+          } else if (round(cor(val$x,val$y) == 0)) {
+            " has no trend."
+          }
+        } else { 
+          " does not contain enough points to determine a trend."
+        },
+        if (input$regressionLine == "TRUE" && length(val$x) >= 3) {
+          " There is also a fitted regression line present to fit the trend of 
+          the points."
+        }
+      )
+    )
   )
   
   # Feedback for each challenge
