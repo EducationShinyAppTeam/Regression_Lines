@@ -7,4 +7,4 @@
 ![App Screenshot](../docs/screenshot.png)
 
 # App Description
-In this app, you will explore the relationship between the regression line and points in a scatterplot.
+In this app, you will explore how the correlation and regression line relate to the points on a scatterplot.
