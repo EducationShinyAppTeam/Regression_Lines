@@ -137,8 +137,8 @@ ui <- list(
             linear relationship; every point lies on the regression line.
             Correlation is strongly affected by outliers."),
             p("Correlation does not change when you change the unit
-             of measurement. For instance, if you find the correlation
-             between people's height (in inches) and their ages (years),
+             of measurement. For instance, if you find the correlation between 
+             elementary school children's height (in inches) and their ages (years),
              that value will be the same if you convert everyone's height
              to centimeters and/or their ages to days. More generally,
              if you transform every observation's values by adding,
@@ -164,8 +164,10 @@ ui <- list(
              the line as small as possible. (Remember that standard deviation
              measures variability and we want to keep the variability around
              the line as small as possible.)"),
-            p("The regression line does not appear appropriately,
-             when there exist outliers."),
+            p("The regression line is not appropriate for making predictions when 
+              there is a non-linear relationship, when there are outliers driving 
+              the prediction, or when you are predicting far beyond the range of 
+              the data."),
             collapsible = TRUE,
             collapsed = TRUE,
             width = 12
