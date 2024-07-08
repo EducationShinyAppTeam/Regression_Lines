@@ -36,7 +36,7 @@ ui <- list(
       sidebarMenu(
         id = "pages",
         menuItem("Overview", tabName = "overview", icon = icon("gauge-high")),
-        menuItem("Prerequistes", tabName = "prerequisites", icon = icon("book")),
+        menuItem("Prerequisites", tabName = "prerequisites", icon = icon("book")),
         menuItem("Challenge", tabName = "challenge", icon = icon("gears")),
         menuItem("References", tabName = "References", icon = icon("leanpub"))
       ),
@@ -53,50 +53,33 @@ ui <- list(
           tabName = "overview",
           h1("Regression Lines"),
           p(
-            "In this App, you will explore how the correlation and
-          regression line relate to the points on a scatterplot."
+            "In this app, you will explore how correlation and
+          regression lines relate to the points on a scatterplot."
           ),
           br(),
           h2("Instructions"),
           tags$ol(
             tags$li(
-              "Head to the Prerequisites page to review concepts related to 
+              "Head to the 'Prerequisites' page to review concepts related to 
               correlation and regression lines."
             ),
             tags$li(
-              "When ready, make your way to Challenge page to further explore 
+              "When ready, make your way to the 'Challenge' page to further explore 
               these concepts."
             ),
             tags$li(
-              "Create your own line by entering the values for both slope
-             and intercept."
+              "There, you can create points by clicking on the scatterplot and create
+              your own line by adjusting the sliders for slope and intercept."
             ),
-            tags$li("Create points by clicking in the plot."),
-            tags$li(
-              "Show the regression line to compute and display
-             the regression line."
-            ),
-            tags$li(
-              "Try your best to complete each challenge with the assistance of 
-              the feedback above the plot."
-            ),
-            tags$li(
-              "Click 'Undo Point' if you would like to undo the last point placed 
-              on the plot."
-            ),
-            tags$li(
-              "Click 'New Challenge'
-            to recieve a new challenge to attempt."
-            ),
-    
-            tags$li("Click 'RESET' to clear both points and regression lines.")
+            tags$li("Use these interactive elements to mimic the situation that
+                    is presented to complete the challenges.")
           ),
           br(),
           div(
             style = "text-align: center;",
             bsButton(
               inputId = "goToPrereq",
-              label = "Prerequisites!",
+              label = "Prerequisites",
               icon = icon("book"),
               size = "large",
             )
@@ -108,8 +91,9 @@ ui <- list(
           p(
             "This app was developed and coded by Caihui Xiao.
             The app was further updated by Zhiliang Zhang and Jiajun Gao
-            in June 2018, Daehoon Gwak in July 2020, and by Sean Burke in June 
-            2023. Special thanks to Sitong Liu for help on some programming issues.",
+            in June 2018, Daehoon Gwak in July 2020, Sean Burke in June 
+            2023, and by Nathan Pechulis in July 2024. Special thanks 
+            to Sitong Liu for help on some programming issues.",
             br(),
             br(),
             br(),
@@ -118,7 +102,7 @@ ui <- list(
             citeApp(),
             br(),
             br(),
-            div(class = "updated", "Last Update: 6/15/2023 by SB.")
+            div(class = "updated", "Last Update: 7/8/2024 by NP.")
           )
         ),
         ### Prerequisites ----
@@ -173,23 +157,18 @@ ui <- list(
             width = 12
           ),
           br(),
-          div(
-            style = "text-align: center;",
-            bsButton(
-              inputId = "goToChallenge",
-              label = "Challenge!",
-              icon("bolt"),
-              size = "large"
-            )
-          )
+          br()
         ),
         ### Challenge ----
         tabItem(
           tabName = "challenge",
           h2("Regression Line and Correlation on a Scatterplot"),
-          p("Using the user inputs, plots, and responsive feedback, explore how 
-          the correlation and regression line relate to the points on a scatterplot 
-          by completing the challenges below to the best of your ability!"),
+          p("Use the interactive graph below to mimic the challenge that is being proposed. 
+          To begin, create points by simply clicking on the graph and adjust the values for 
+          your line's slope/intercept (if a line is needed) while also checking the 
+          'Create your own line' box. Then, you can utilize the given feedback from the 
+          other two checkboxes to get as close to the prompt as you can. Try your best to 
+          complete as many of the challenges as you can, good luck!"),
           br(),
           h3("Challenge"),
           uiOutput(
@@ -219,7 +198,7 @@ ui <- list(
                 ),
                 checkboxInput(
                   inputId = "yourOwnLine",
-                  label = "Create your own line (Red)",
+                  label = "Create your own line (red)",
                   value = FALSE
                 ),
                 checkboxInput(
@@ -256,26 +235,29 @@ ui <- list(
               width = 8,
               # Add a row for the main content
               fluidRow(
-                # Create a space for the plot output and enable click function
-                textOutput('feedback'),
-                plotOutput(
-                  outputId = "clusterPlot",
-                  click = "clusterClick"
-                ),
-                br(),
-                conditionalPanel(
-                  condition = "input.yourOwnLine !=0",
-                  textOutput('yourline')
-                ),
-                br(),
-                conditionalPanel(
-                  condition = "input.regressionLine !=0",
-                  textOutput('regression_equation')
-                ),
-                br(),
-                conditionalPanel(
-                  condition = "input.correlation !=0",
-                  textOutput('correlation')
+                column(
+                  width = 12,
+                  # Create a space for the plot output and enable click function
+                  textOutput('feedback'),
+                  plotOutput(
+                    outputId = "clusterPlot",
+                    click = "clusterClick"
+                  ),
+                  br(),
+                  conditionalPanel(
+                    condition = "input.yourOwnLine !=0",
+                    textOutput('yourline')
+                  ),
+                  br(),
+                  conditionalPanel(
+                    condition = "input.regressionLine !=0",
+                    textOutput('regression_equation')
+                  ),
+                  br(),
+                  conditionalPanel(
+                    condition = "input.correlation !=0",
+                    textOutput('correlation')
+                  )
                 )
               )
             )
@@ -372,18 +354,6 @@ server <- function(input, output,session) {
     }
   )
   
-  ## Explore button ----
-  observeEvent(
-    eventExpr = input$goToChallenge, 
-    handlerExpr = {
-      updateTabItems(
-        session = session,
-        inputId = "pages",
-        selected = "challenge"
-      )
-    }
-  )
-
   ### New Challenge button ----
   observeEvent(
     eventExpr = input$newChallenge,
