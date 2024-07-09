@@ -110,9 +110,12 @@ ui <- list(
           withMathJax(),
           tabName = "prerequisites",
           h2("Prerequisites"),
+          p("This tab contains fundamental information about correlation and
+          regression lines. Simply click on the plus sign on the right of 
+          the tabs to expand them."),
           br(),
           box(
-            title = "Correlation",
+            title = tags$strong("Correlation"),
             p("Correlation measures the strength of the linear association
             between two variables/attributes and is therefore
             not appropriate for non-linear patterns.
@@ -133,7 +136,7 @@ ui <- list(
             width = 12
           ),
           box(
-            title = "Regression Lines",
+            title = tags$strong("Regression Lines"),
             p("The regression line provides a straight line that describes
              a response variable Y that changes as an explanatory
              variable X changes. The regression line has the linear form
@@ -215,18 +218,20 @@ ui <- list(
                   bsButton(
                     inputId = "newChallenge",
                     label = "New Challenge",
+                    icon = icon("forward"),
                     size = "large"
                   ),
                   bsButton(
                     inputId = "undoButton",
                     label = "Undo Point",
+                    icon = icon("undo"),
                     size = "large"
                   ),
                   bsButton(
                     inputId = "reset",
                     label = "Reset",
-                    size = "large",
-                    style = "danger"
+                    icon = icon("eraser"),
+                    size = "large"
                   )
                 )
               )
@@ -545,7 +550,7 @@ server <- function(input, output,session) {
           limits = c(-5,5)
         ) +
         labs(x = "X", y = "Y") +
-        theme_bw() +
+        theme_bw(base_size = 20) +
         coord_cartesian(xlim = c(-5, 5), ylim = c(-5, 5), expand = FALSE)
       
       if (input$yourOwnLine > 0) {
