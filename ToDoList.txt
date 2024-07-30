@@ -1,20 +1,6 @@
 # Things Needed for This Version
-
-1. Add screenshot ✓
-2. Add/Fix description/README/CODEOWNERS/.lintr files ✓
-3. Add docs folder. ✓
-4. Add Cite this app as entry. ✓
-5. Use boastUtils palettes ✓
-6. Update code to utilize the alt argument. ✓
-7. Update description aut and ctrb ✓
-8. Update Information Button. ✓
-9. Update alt arguments ✓
-10. Reorganize the Challenge Page ✓
-11. Convert to ggplot.✓
-12. Add adaptive alt text to plot ✓
-13. Update references ✓
+1.
 
 # Ideas for Future Development
 
-1. Possibly add an Undo button that undoes the last point clicked on in the plot
-  Should delete the last row of coordinates. ✓ (Added a functioning undo button)
+1. Need to move away from hard coding questions and feedback to a question bank
