@@ -6,8 +6,8 @@ library(shinyWidgets)
 library(boastUtils)
 library(ggplot2)
 
-
 # Define global constants and functions ----
+## none at this time
 
 # Define the UI ----
 ui <- list(
@@ -61,11 +61,11 @@ ui <- list(
           h2("Instructions"),
           tags$ol(
             tags$li(
-              "Head to the 'Prerequisites' page to review concepts related to 
+              "Head to the 'Prerequisites' page to review concepts related to
               correlation and regression lines."
             ),
             tags$li(
-              "When ready, make your way to the 'Challenge' page to further explore 
+              "When ready, make your way to the 'Challenge' page to further explore
               these concepts."
             ),
             tags$li(
@@ -92,9 +92,8 @@ ui <- list(
           p(
             "This app was developed and coded by Caihui Xiao.
             The app was further updated by Zhiliang Zhang and Jiajun Gao
-            in June 2018, Daehoon Gwak in July 2020, Sean Burke in June 
-            2023, and by Nathan Pechulis in July 2024. Special thanks 
-            to Sitong Liu for help on some programming issues.",
+            in June 2018, Daehoon Gwak in July 2020, Sean Burke in June
+            2023, and by Nathan Pechulis in July 2024.",
             br(),
             br(),
             br(),
@@ -111,51 +110,76 @@ ui <- list(
           withMathJax(),
           tabName = "prerequisites",
           h2("Prerequisites"),
-          p("This tab contains fundamental information about correlation and
-          regression lines. Simply click on the plus sign on the right of 
-          the tabs to expand them."),
+          p("To get the most out of this app, review the following information
+            about correlation and regression lines."),
           br(),
           box(
             title = tags$strong("Correlation"),
-            p("Correlation measures the strength of the linear association
-            between two variables/attributes and is therefore
-            not appropriate for non-linear patterns.
-            Correlations are always values between –1 and +1.
-            A correlation of –1 or +1 indicates that we have a perfect
-            linear relationship; every point lies on the regression line.
-            Correlation is strongly affected by outliers."),
-            p("Correlation does not change when you change the unit
-             of measurement. For instance, if you find the correlation between 
-             elementary school children's height (in inches) and their ages (years),
-             that value will be the same if you convert everyone's height
-             to centimeters and/or their ages to days. More generally,
-             if you transform every observation's values by adding,
-             subtracting, multiplying, and/or dividing by the same number,
-             the correlation will remain the same."),
+            tags$ul(
+              tags$li(
+                "Correlation measures the strength of the linear association
+                between two variables/attributes and is therefore not appropriate
+                for non-linear relationships. Correlations are always values
+                between –1 and +1, inclusive. A correlation of –1 or +1 indicates
+                that we have a perfect linear relationship; every point lies on
+                the regression line. Correlation is strongly affected by outliers."
+              ),
+              tags$li(
+                "Correlation does not change when you change the unit of
+                measurement. For instance, if you find the correlation between
+                elementary school children's height (in inches) and their ages
+                (years), that value will be the same if you convert everyone's
+                height to centimeters and/or their ages to days. More generally,
+                if you transform every observation's values by adding,
+                subtracting, multiplying, and/or dividing by the same number,
+                the correlation will remain the same."
+              )
+            ),
             collapsible = TRUE,
             collapsed = TRUE,
             width = 12
           ),
           box(
             title = tags$strong("Regression Lines"),
-            p("The regression line provides a straight line that describes
-             a response variable Y that changes as an explanatory
-             variable X changes. The regression line has the linear form
-             telling you the predicted value Y, when you know that
-             the variable X has a specific value x: \\[\\widehat{Y}=a+b*x\\]"),
-            p("In this case, 'a' is an intercept (what you predict for Y
-             when x = 0) and 'b' is the slope (how much the average value of Y
-             goes up for each unit of x). The slope 'b' will always have
-             the same sign as the correlation."),
-            p("The regression line is the straight line that makes the standard
-             deviation of the vertical distances of the data points from
-             the line as small as possible. (Remember that standard deviation
-             measures variability and we want to keep the variability around
-             the line as small as possible.)"),
-            p("The regression line is not appropriate for making predictions when 
-              there is a non-linear relationship, when there are outliers driving 
-              the prediction, or when you are predicting far beyond the range of 
-              the data."),
+            tags$ul(
+              tags$li(
+                "A regression line is the graph of a linear function thought to
+                describe how a response variable (typically \\(Y\\)) changes as
+                an explanatory variable (typically \\(X\\)) changes. The regression
+                line's linear form focuses on the", tags$em("predicted value"),
+                "of the response (\\(\\widehat{Y}\\)). Thus, when you know that
+                \\(X\\) takes on a specific value, \\(x\\), you can find the
+                predicted value with the formula: \\[\\widehat{Y}=a+b*x\\]"
+              ),
+              tags$li(
+                "In the above formula, \\(a\\) is an intercept--what you would
+                predict for \\(Y\\) when \\(x = 0\\). The \\(b\\) is the slope or
+                rate of change of \\(Y\\) with respect to \\(X\\). The slope tells
+                you how many times the change in \\(Y\\) is as large as the
+                corresponding change in \\(X\\). The sign of the slope will always
+                match the sign of the correlation value."
+              ),
+              tags$li(
+                "The regression line is the graph of the linear function that
+                minimizes the vertical distance between the line and each of the
+                cases (data points). This results in the smallest standard deviation
+                for the error (i.e., the vertical distance between the line and
+                each case). Recall that  standard deviation measures variability
+                and we want to keep the variability around the line as small as
+                possible."
+              ),
+              tags$li(
+                "The regression line is not appropriate for making predictions
+                when",
+                tags$ul(
+                  tags$li("there is a non-linear relationship,"),
+                  tags$li("when there are outliers driving the prediction and/or
+                          relationship, or"),
+                  tags$li("when you are predicting far beyond the range of the
+                          data.")
+                )
+              )
+            ),
             collapsible = TRUE,
             collapsed = TRUE,
             width = 12
@@ -167,22 +191,25 @@ ui <- list(
         tabItem(
           tabName = "challenge",
           h2("Regression Line and Correlation on a Scatterplot"),
-          p("Use the interactive graph below to mimic the challenge that is being proposed. 
-          To begin, create points by simply clicking on the graph and adjust the values for 
-          your line's slope/intercept (if a line is needed) while also checking the 
-          'Create your own line' box. Then, you can utilize the given feedback from the 
-          other two checkboxes to get as close to the prompt as you can. Try your best to 
-          complete as many of the challenges as you can, good luck!"),
+          p(
+            "Use the interactive graph below to mimic the challenge that is being
+            proposed. To begin, create points by simply clicking on the graph and
+            adjust the values for your line's slope/intercept (if a line is needed)
+            while also checking the 'Create your own line' box. Then, you can
+            utilize the given feedback from the other two checkboxes to get as
+            close to the prompt as you can. Try your best to complete as many of
+            the challenges as you can; good luck!"
+          ),
           br(),
           h3("Challenge"),
           uiOutput(
-            outputId = "question", 
+            outputId = "question",
             class = "largerFont"
           ),
           br(),
           fluidRow(
             column(
-              width = 3,
+              width = 4,
               wellPanel(
                 sliderInput(
                   inputId = "intercept",
@@ -207,7 +234,7 @@ ui <- list(
                 ),
                 checkboxInput(
                   inputId = "regressionLine",
-                  label = "Show regression line (black)",
+                  label = "Show regression line (blue)",
                   value =  FALSE
                 ),
                 checkboxInput(
@@ -215,56 +242,47 @@ ui <- list(
                   label = "Show correlation value",
                   value = FALSE
                 ),
-                fluidRow(
-                  bsButton(
-                    inputId = "newChallenge",
-                    label = "New Challenge",
-                    icon = icon("forward"),
-                    size = "large"
-                  ),
-                  bsButton(
-                    inputId = "undoButton",
-                    label = "Undo Point",
-                    icon = icon("undo"),
-                    size = "large"
-                  ),
-                  bsButton(
-                    inputId = "reset",
-                    label = "Reset",
-                    icon = icon("eraser"),
-                    size = "large"
-                  )
+                bsButton(
+                  inputId = "newChallenge",
+                  label = "New Challenge",
+                  icon = icon("forward"),
+                  size = "large"
+                ),
+                bsButton(
+                  inputId = "undoButton",
+                  label = "Undo Point",
+                  icon = icon("undo"),
+                  size = "large"
+                ),
+                bsButton(
+                  inputId = "reset",
+                  label = "Reset",
+                  icon = icon("eraser"),
+                  size = "large"
                 )
               )
             ),
             column(
               width = 8,
-              # Add a row for the main content
-              fluidRow(
-                column(
-                  width = 12,
-                  # Create a space for the plot output and enable click function
-                  textOutput('feedback'),
-                  plotOutput(
-                    outputId = "clusterPlot",
-                    click = "clusterClick"
-                  ),
-                  br(),
-                  conditionalPanel(
-                    condition = "input.yourOwnLine !=0",
-                    textOutput('yourline')
-                  ),
-                  br(),
-                  conditionalPanel(
-                    condition = "input.regressionLine !=0",
-                    textOutput('regression_equation')
-                  ),
-                  br(),
-                  conditionalPanel(
-                    condition = "input.correlation !=0",
-                    textOutput('correlation')
-                  )
-                )
+              textOutput('feedback'),
+              plotOutput(
+                outputId = "clusterPlot",
+                click = "clusterClick"
+              ),
+              br(),
+              conditionalPanel(
+                condition = "input.yourOwnLine !=0",
+                textOutput('yourline')
+              ),
+              br(),
+              conditionalPanel(
+                condition = "input.regressionLine !=0",
+                textOutput('regression_equation')
+              ),
+              br(),
+              conditionalPanel(
+                condition = "input.correlation !=0",
+                textOutput('correlation')
               )
             )
           )
@@ -275,47 +293,46 @@ ui <- list(
           h2("References"),
           p(     #shinyBS
             class = "hangingindent",
-            "Bailey, E. (2015), shinyBS: Twitter bootstrap components for shiny,
-            R package. Available from
+            "Bailey, E. (2022). shinyBS: Twitter bootstrap components for shiny.
+            (v 0.61.1). [R package]. Available from
             https://CRAN.R-project.org/package=shinyBS"
           ),
           p(     #Boast Utilities
             class = "hangingindent",
-            "Carey, R. (2019), boastUtils: BOAST Utilities, R Package.
-           Available from https://github.com/EducationShinyAppTeam/boastUtils"
+            "Carey, R. and Hatfield, N. J. (2024). boastUtils: BOAST utlities.
+            (v 0.1.12.2). [R package]. Available from
+            https://github.com/EducationShinyAppTeam/boastUtils"
           ),
           p(     #shinydashboard
             class = "hangingindent",
-            "Chang, W. and Borges Ribeio, B. (2018), shinydashboard: Create
-            dashboards with 'Shiny', R Package. Available from
+            "Chang, W., and Borges Ribeiro, B. (2021). shinydashboard: Create
+            dashboards with 'shiny'. (v 0.7.2) [R package]. Available from
             https://CRAN.R-project.org/package=shinydashboard"
           ),
           p(     #shiny
             class = "hangingindent",
-            "Chang, W., Cheng, J., Allaire, J., Xie, Y., and McPherson, J.
-            (2019), shiny: Web application framework for R, R Package.
-            Available from https://CRAN.R-project.org/package=shiny"
+            "Chang, W., Cheng J., Allaire, J., Sievert, C., Schloerke, B., Xie, Y.,
+            Allen, J., McPherson, J., Dipert, A., and Borges, B. (2024). shiny:
+            Web application framework for R. (v 1.8.1.1). [R package]. Available
+            from https://CRAN.R-project.org/package=shiny"
           ),
           p(     #shinyWidgets
             class = "hangingindent",
-            "Perrier, V., Meyer, F., Granjon, D., Fellows, I., and Davis, W.
-            (2020), shinyWidgets: Custom Inputs Widgets for Shiny,
-            R package. Available from
-            https://cran.r-project.org/web/packages/shinyWidgets/index.html"
+            "Perrier, V., Meyer, F., and Granjon, D. (2024). shinyWidgets: Custom
+            inputs widgets for shiny. (v 0.8.6). [R package]. Available from
+            https://CRAN.R-project.org/package=shinyWidgets"
           ),
           p(     #reference for ideas
             class = "hangingindent",
-            "Statistical Applets - Correlation and Regression (n.d.),
-          Available from
-          http://digitalfirst.bfwpub.com/stats_applet/generic_stats_applet_5_correg.html"
+            "Statistical Applets: Correlation and regression. (n.d.). [Web applet;
+            original idea]. Available from
+            http://digitalfirst.bfwpub.com/stats_applet/generic_stats_applet_5_correg.html"
           ),
           p(     # ggplot2
             class = "hangingindent",
-            "Wickham, H., Chang, W., Henry, L., Pedersen, T.L., Takahashi, K.,
-            Wilke, C, Woo, K., Yutani, H., and Dunnington, D. (2020),
-            ggplot2: Create Elegant Data Visualisations Using the
-            Grammar of Graphics, R Package. Available from
-            https://cran.r-project.org/web/packages/ggplot2/index.html"
+            "Wickham, H. (2016). ggplot2: Elegant graphics for data analysis.
+            Springer-Verlag:New York. (v 3.5.1) [R package]. Available from
+            https://ggplot2.tidyverse.org"
           ),
           br(),
           br(),
@@ -337,8 +354,8 @@ server <- function(input, output,session) {
         session = session,
         title = "Information",
         type = "info",
-        text = "This app will allow you to explore the connection between the data 
-        points, their correlation, and the regression line through challenges 
+        text = "This app will allow you to explore the connection between the data
+        points, their correlation, and the regression line through challenges
         using an interactive scatterplot."
       )
     }
@@ -350,7 +367,7 @@ server <- function(input, output,session) {
 
   ## Prerequisites button  ----
   observeEvent(
-    eventExpr = input$goToPrereq, 
+    eventExpr = input$goToPrereq,
     handlerExpr = {
       updateTabItems(
         session = session,
@@ -359,7 +376,7 @@ server <- function(input, output,session) {
       )
     }
   )
-  
+
   ### New Challenge button ----
   observeEvent(
     eventExpr = input$newChallenge,
@@ -368,7 +385,7 @@ server <- function(input, output,session) {
       c$right <- sample(1:11,1)
       val$x <- NULL
       val$y <- NULL
-      
+
       ### Update inputs
       updateSliderInput(
         session = session,
@@ -397,7 +414,7 @@ server <- function(input, output,session) {
       )
     }
   )
-  
+
   ### Reset Button ----
   observeEvent(
     eventExpr = input$reset,
@@ -405,7 +422,7 @@ server <- function(input, output,session) {
       ### Reset values
       val$x <- NULL
       val$y <- NULL
-      
+
       #Update inputs
       updateSliderInput(
         session = session,
@@ -441,7 +458,7 @@ server <- function(input, output,session) {
       paste(
         "Equation of your line: y =",
         input$intercept,
-        "+", 
+        "+",
         "(",
         input$slope,
         ")", "
@@ -515,7 +532,7 @@ server <- function(input, output,session) {
       # Initially will be empty
       if (is.null(input$clusterClick)) {
         return()
-      } 
+      }
       isolate(
         expr = {
           val$x <- c(val$x, input$clusterClick$x)
@@ -524,7 +541,7 @@ server <- function(input, output,session) {
       )
     }
   )
-  
+
   ### Render Cluster Plot ----
   output$clusterPlot <- renderPlot(
     expr = {
@@ -533,13 +550,13 @@ server <- function(input, output,session) {
       } else {
         data1 <- data.frame(x = val$x, y = val$y)
       }
-      
+
       clusPlot <- ggplot(
-        data = data1, 
+        data = data1,
         mapping = aes(x = x, y = y)
       ) +
         geom_point(
-          size = 4.5, 
+          size = 4.5,
           col = boastUtils::boastPalette[1]
         ) +
         scale_x_continuous(
@@ -553,7 +570,7 @@ server <- function(input, output,session) {
         labs(x = "X", y = "Y") +
         theme_bw(base_size = 20) +
         coord_cartesian(xlim = c(-5, 5), ylim = c(-5, 5), expand = FALSE)
-      
+
       if (input$yourOwnLine > 0) {
         clusPlot <- clusPlot + geom_abline(
           intercept = input$intercept,
@@ -562,7 +579,7 @@ server <- function(input, output,session) {
           lwd = 1.25
         )
       }
-      
+
       if (input$regressionLine == "TRUE" & length(val$x) >= 3) {
         model <- lm(y ~ x, data = data1)
         clusPlot <- clusPlot + geom_abline(
@@ -574,9 +591,9 @@ server <- function(input, output,session) {
         output$regression_equation <- renderText(
           expr = {
             paste(
-              "Regression Equation: y =", 
+              "Regression Equation: y =",
               round(coef(model)[1], digits = 2),
-              "+ (", 
+              "+ (",
               round(coef(model)[2], digits = 2),
               ") * x"
             )
@@ -587,7 +604,7 @@ server <- function(input, output,session) {
           "More points are required to display the regression equation"
         )
       }
-      
+
       if (input$correlation == "TRUE" & length(val$x) >= 3) {
         output$correlation <- renderText(
           expr = {
@@ -599,7 +616,7 @@ server <- function(input, output,session) {
           "More points are needed to display the value of the correlation"
         )
       }
-      clusPlot 
+      clusPlot
     },
     #### Cluster Plot Alt Text ----
     alt = reactive(
@@ -615,7 +632,7 @@ server <- function(input, output,session) {
           } else if (round(cor(val$x,val$y) == 0)) {
             " has no trend."
           }
-        } else { 
+        } else {
           " does not contain enough points to determine a trend."
         },
         if (input$regressionLine == "TRUE" && length(val$x) >= 3) {
@@ -627,7 +644,7 @@ server <- function(input, output,session) {
       )
     )
   )
-  
+
   # Feedback for each challenge
   output$feedback <- renderText(
     expr = {
@@ -771,7 +788,7 @@ server <- function(input, output,session) {
                   correlation.")
         }
         else if (length(val$x) >= 3 & (round(cor(val$x,val$y), digits = 1)
-                                       < -0.1 | round(cor(val$x,val$y), 
+                                       < -0.1 | round(cor(val$x,val$y),
                                                       digits = 1) > 0.1)) {
           paste("Sorry, correlation is not between -0.1 and 0.1.",
                 "Please add other points or try again for the correlation.",
@@ -790,7 +807,7 @@ server <- function(input, output,session) {
                   correlation.")
         }
         else if (length(val$x) >= 3 & (round(cor(val$x,val$y), digits = 1)
-                                       < 0.4 | round(cor(val$x,val$y), 
+                                       < 0.4 | round(cor(val$x,val$y),
                                                      digits = 1) > 0.6)) {
           paste("Sorry, correlation is not between 0.4 and 0.6.",
                 "Please add other points or try again for the correlation.",
@@ -809,11 +826,11 @@ server <- function(input, output,session) {
       }
     }
   )
-  
-  
+
+
   ### Undo Last Point Button ----
   observeEvent(
-    eventExpr = input$undoButton, 
+    eventExpr = input$undoButton,
     handlerExpr = {
       # Remove the last row from the dataframe
       val$x <- val$x[-length(val$x)]
